@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dwag 드왁 — 우리 개 걸음의 스웨그를 지켜주는 앱</title>
+<meta name="description" content="반려견 30초 보행 영상으로 관절·슬개골 이상 신호를 스크리닝하는 온디바이스 iOS 앱. 학습부터 론칭까지의 여정을 기록합니다.">
+<style>
+:root {
+  --bg: #faf9f6; --card: #ffffff; --ink: #1c1b18; --sub: #6b6960;
+  --accent: #6c4ef5; --accent2: #f59e0b; --line: #e8e6df;
+  --ok: #16a34a; --wip: #d97706; --wait: #9ca3af;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141311; --card: #1f1e1a; --ink: #f0efe9; --sub: #a4a196;
+    --accent: #8b71ff; --accent2: #fbbf24; --line: #32302a;
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+  line-height: 1.65; -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
+header { padding: 72px 0 40px; text-align: center; }
+.badge {
+  display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  color: var(--accent); border: 1.5px solid var(--accent);
+  border-radius: 999px; padding: 4px 14px; margin-bottom: 20px;
+}
+h1 { font-size: clamp(40px, 9vw, 64px); font-weight: 900; letter-spacing: -0.03em; }
+h1 .tail { display: inline-block; transform-origin: 70% 70%; animation: wag 1.6s ease-in-out infinite; }
+@keyframes wag { 0%,100% { transform: rotate(0deg);} 25% { transform: rotate(14deg);} 75% { transform: rotate(-6deg);} }
+.tagline { font-size: 19px; color: var(--sub); margin-top: 14px; }
+.tagline b { color: var(--ink); }
+.namestory {
+  margin: 28px auto 0; max-width: 560px; font-size: 15px; color: var(--sub);
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px;
+}
+.namestory code { font-weight: 800; color: var(--accent); font-family: inherit; }
+section { margin-top: 56px; }
+h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+.sub { color: var(--sub); font-size: 15px; margin-bottom: 20px; }
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 16px; padding: 20px 22px; margin-bottom: 12px;
+}
+.card h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+.card p { font-size: 15px; color: var(--sub); }
+.card p b { color: var(--ink); }
+.chain .card { position: relative; padding-left: 54px; }
+.chain .card::before {
+  content: attr(data-step); position: absolute; left: 18px; top: 22px;
+  width: 24px; height: 24px; border-radius: 8px; background: var(--accent);
+  color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.stat { text-align: center; padding: 22px 12px; }
+.stat .num { font-size: 30px; font-weight: 900; color: var(--accent); letter-spacing: -0.02em; }
+.stat .lbl { font-size: 13px; color: var(--sub); margin-top: 4px; }
+.timeline { border-left: 2.5px solid var(--line); margin-left: 8px; padding-left: 24px; }
+.tl { position: relative; padding-bottom: 26px; }
+.tl::before {
+  content: ""; position: absolute; left: -31.5px; top: 7px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); border: 2.5px solid var(--bg);
+}
+.tl.future::before { background: var(--wait); }
+.tl .date { font-size: 12.5px; font-weight: 700; color: var(--accent); letter-spacing: .03em; }
+.tl.future .date { color: var(--wait); }
+.tl h3 { font-size: 16px; font-weight: 800; margin: 3px 0 3px; }
+.tl p { font-size: 14.5px; color: var(--sub); }
+.rule {
+  border-left: 4px solid var(--accent2); background: var(--card);
+  border-radius: 0 14px 14px 0; padding: 14px 18px; margin-bottom: 10px;
+  font-size: 15px;
+}
+.rule b { color: var(--accent2); }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; color: var(--sub); font-weight: 700; }
+.st { font-weight: 800; font-size: 13px; }
+.st.ok { color: var(--ok); } .st.wip { color: var(--wip); } .st.wait { color: var(--wait); }
+.note {
+  margin-top: 48px; text-align: center; font-size: 13.5px; color: var(--sub);
+  border-top: 1px solid var(--line); padding-top: 28px;
+}
+footer { text-align: center; padding: 36px 0 20px; font-size: 14px; color: var(--sub); }
+footer a { color: var(--accent); text-decoration: none; font-weight: 700; }
+.scroll-x { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="badge">BUILD IN PUBLIC</div>
+  <h1>Dwag<span class="tail">🐕</span></h1>
+  <p class="tagline"><b>우리 개 걸음의 스웨그를 지켜주는 앱</b><br>
+  30초 보행 영상으로 관절·슬개골 신호를 살펴보는 온디바이스 스크리닝</p>
+  <div class="namestory">
+    <code>D·W·A·G</code> = dog + swag. 철자 안에 <code>wag</code>(꼬리 흔들기)가 살고 있고,
+    소리 내어 읽으면 <code>dawg</code>(잘 지내냐, 친구).
+    아픈 개는 걸음에서 스웨그를 잃는다 — 그걸 지켜주는 게 이 앱의 일.
+  </div>
+</header>
+
+<section>
+  <h2>왜 만드나</h2>
+  <p class="sub">Challenge Based Learning으로 좁혀온 문제 정의</p>
+  <div class="chain">
+    <div class="card" data-step="BI">
+      <h3>Big Idea — 펫 헬스케어</h3>
+      <p>반려동물은 아픔을 말로 표현하지 못한다. 보호자의 "알아차림"이 곧 건강 수명을 결정한다.</p>
+    </div>
+    <div class="card" data-step="EQ">
+      <h3>Essential Question</h3>
+      <p>"말하지 못하는 반려견의 건강 이상을, 보호자는 어떻게 <b>너무 늦기 전에</b> 알아차릴 수 있을까?"</p>
+    </div>
+    <div class="card" data-step="C">
+      <h3>Challenge</h3>
+      <p>특별한 장비나 전문 지식 없이, 일상 속에서 반려견의 건강 이상 신호를 조기에 발견하도록 돕자.</p>
+    </div>
+    <div class="card" data-step="RC">
+      <h3>Refined Challenge</h3>
+      <p><b>스마트폰으로 30초 걸음걸이를 찍는 것만으로</b>, 소형견 보호자가 슬개골·관절 이상 신호를
+      조기에 발견하고 <b>매달 변화를 추적</b>해 병원 갈 타이밍을 놓치지 않게 하자.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>무엇이 다른가</h2>
+  <p class="sub">국내외 어디에도 없는 조합을 확인하고 시작했다</p>
+  <div class="grid">
+    <div class="card stat"><div class="num">0개</div><div class="lbl">카메라만으로 동적 보행을 분석하는<br>소비자 구독 서비스 (조사 결과)</div></div>
+    <div class="card stat"><div class="num">4~5마리 중 1</div><div class="lbl">슬개골 탈구를 겪는 한국 소형견<br>(유병 추정 20~25%)</div></div>
+    <div class="card stat"><div class="num">100%</div><div class="lbl">온디바이스 분석 —<br>영상은 폰 밖으로 나가지 않는다</div></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>⚕️ 그리고 하나의 원칙</h3>
+    <p>Dwag는 진단하지 않는다. <b>"병원 갈 타이밍을 알려주는 보호자의 눈"</b> —
+    모든 결과는 스크리닝 참고용이며, 항상 수의사 상담을 권장하는 프레임을 지킨다.</p>
+  </div>
+</section>
+
+<section>
+  <h2>어떻게 만드나</h2>
+  <p class="sub">포즈 추정(공간) + 경량 시계열(시간), 전부 기기 안에서</p>
+  <div class="scroll-x"><table>
+    <tr><th>단계</th><th>기술</th><th>왜</th></tr>
+    <tr><td>포즈 추출</td><td>Apple Vision 동물 포즈 (25관절)</td><td>온디바이스 무료, 외형·배경에 불변</td></tr>
+    <tr><td>궤적 분석</td><td>14관절 정규화 + TCN <b>185K 파라미터</b></td><td>2천여 영상으로 학습 가능한 데이터 효율</td></tr>
+    <tr><td>탑재</td><td>Core ML <b>388KB</b>, iOS 17+</td><td>오프라인·프라이버시·서버비 0</td></tr>
+    <tr><td>데이터</td><td>AI Hub 반려견 보행영상 (중소형견 1,000+ 마리)</td><td>파행도 5단계 + 다리별 압력 정답지</td></tr>
+    <tr><td>평가</td><td>민감도/특이도, 특이도 0.90 우선 캘리브레이션</td><td>위양성 남발은 신뢰 붕괴 — 언어·UX까지 한 체계</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>빌드 로그</h2>
+  <p class="sub">학습과 구현의 여정 — 계속 업데이트</p>
+  <div class="timeline">
+    <div class="tl">
+      <div class="date">2026.08.10</div>
+      <h3>킥오프 — 시장을 먼저, 모델은 수단으로</h3>
+      <p>국내외 펫 헬스케어 앱 경쟁 리서치로 빈 포지션 확인, BM 확정. 서비스가 성립해야 데이터도 의미가 있다.</p>
+    </div>
+    <div class="tl">
+      <div class="date">2026.08.10</div>
+      <h3>데이터셋 스키마 복원</h3>
+      <p>공개 페이지에 없는 라벨 구조(해부학 14 KeyPoint, 다리별 좌/우 중증도, 압력센서 CSV)를
+      구축기관 발표영상 프레임 판독으로 복원.</p>
+    </div>
+    <div class="tl">
+      <div class="date">2026.08.10</div>
+      <h3>아키텍처 확정 — 포즈 + 시계열</h3>
+      <p>비디오 분류 단일 모델 기각. keypoint가 외형을 지워 트레드밀→가정 촬영 도메인 갭을 버틴다.
+      해석 가능한 보행 지표(좌우 균형)는 그대로 제품 언어가 된다.</p>
+    </div>
+    <div class="tl">
+      <div class="date">2026.08.10</div>
+      <h3>파이프라인 검증 — 심은 신호를 되찾을 수 있는가</h3>
+      <p>합성 보행 궤적에 파행 신호(좌우 진폭 비대칭)를 주입하고 학습 하네스가 복원하는지 실험 —
+      <b>AUC 0.986, 민감도(2기+) 100%</b>. 이제 실데이터만 오면 된다.</p>
+    </div>
+    <div class="tl">
+      <div class="date">2026.08.10</div>
+      <h3>iOS 스캐폴드 — 촬영부터 공유 카드까지</h3>
+      <p>촬영/선택 → 온디바이스 분석 → 3단계 결과("정상 범위/관찰 필요/상담 권장") → 공유 카드.
+      Core ML 변환 검증 완료, 시뮬레이터 실행 확인.</p>
+    </div>
+    <div class="tl">
+      <div class="date">2026.08.11</div>
+      <h3>리브랜딩 — Dwag 탄생 🎉</h3>
+      <p>"펫 닥터 포켓"에서 Dwag로. dog+swag+wag 삼중 유희, 상표·앱스토어 충돌 없는 빈 이름 확인.
+      이 여정 사이트 오픈.</p>
+    </div>
+    <div class="tl future">
+      <div class="date">NEXT</div>
+      <h3>실데이터 학습 → 평가를 내 손으로 판단</h3>
+      <p>AI Hub 실데이터 학습 완주 후, 평가 리포트를 읽고 출시 게이트(특이도 0.90에서 민감도 0.85+)
+      통과 여부를 스스로 판정하는 것이 다음 학습 마일스톤.</p>
+    </div>
+    <div class="tl future">
+      <div class="date">THEN</div>
+      <h3>실기기 E2E → TestFlight → 출시</h3>
+      <p>실제 강아지 촬영 엔드투엔드 테스트, 결과 화면 언어 최종 결정, 한국 또는 미국 우선 출시.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>AI와 함께, 그러나 학습의 주도권은 내게</h2>
+  <p class="sub">이 프로젝트는 AI(Claude)와 페어로 만든다. 경계선 두 줄이 나를 지킨다</p>
+  <div class="rule"><b>원칙 1</b> — 숫자를 만드는 건 AI에 맡겨도, <b style="color:var(--ink)">숫자를 읽고 결정하는 건 내 일</b>이다.</div>
+  <div class="rule"><b>원칙 2</b> — 화면을 만드는 건 AI에 맡겨도, <b style="color:var(--ink)">화면이 하는 말을 정하는 건 내 일</b>이다.</div>
+</section>
+
+<section>
+  <h2>현재 상태</h2>
+  <div class="scroll-x"><table>
+    <tr><th>항목</th><th>상태</th></tr>
+    <tr><td>시장 리서치 · BM · 아키텍처</td><td class="st ok">완료</td></tr>
+    <tr><td>데이터 파이프라인 + 학습 하네스 검증</td><td class="st ok">완료</td></tr>
+    <tr><td>Core ML 변환 검증 · iOS 스캐폴드</td><td class="st ok">완료</td></tr>
+    <tr><td>실데이터 학습 · 평가</td><td class="st wip">데이터 준비 중</td></tr>
+    <tr><td>실기기 E2E · TestFlight</td><td class="st wait">대기</td></tr>
+    <tr><td>출시 (KR / US)</td><td class="st wait">대기</td></tr>
+  </table></div>
+</section>
+
+<p class="note">Dwag의 모든 결과는 스크리닝 참고용이며 의학적 진단이 아닙니다.<br>
+이상 신호와 무관하게 반려견의 정기 검진을 권장합니다.</p>
+
+<footer>
+  만드는 사람 <a href="https://github.com/jsonpassion">@jsonpassion</a> · Apple Developer Academy 러너<br>
+  AI 페어 Claude와 함께 · 2026
+</footer>
+
+</div>
+</body>
+</html>
