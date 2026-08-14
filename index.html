@@ -12,12 +12,27 @@
   --sketch: #3a3a3c;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #161617; --ink: #f2f2f4; --sub: #98989f; --accent: #4da3ff;
     --line: #2f2f33; --soft: #212124; --ok: #4cc06e; --wip: #e59a3d; --wait: #7c7c82;
     --sketch: #c9c9cf;
   }
 }
+:root[data-theme="dark"] {
+  --bg: #161617; --ink: #f2f2f4; --sub: #98989f; --accent: #4da3ff;
+  --line: #2f2f33; --soft: #212124; --ok: #4cc06e; --wip: #e59a3d; --wait: #7c7c82;
+  --sketch: #c9c9cf;
+}
+#themeToggle {
+  position: fixed; top: 18px; right: 18px; z-index: 10;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  font-size: 17px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  transition: transform .2s ease;
+}
+#themeToggle:hover { transform: scale(1.08); }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -102,8 +117,16 @@ figure.sketch figcaption { font-size: 13px; color: var(--wait); margin-top: 8px;
   font-size: 13px; color: var(--wait); text-align: center; }
 footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--sub); }
 </style>
+<script>
+  // FOUC 방지: 저장된 테마를 렌더 전에 적용
+  (function () {
+    var t = localStorage.getItem("dogtor-theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  })();
+</script>
 </head>
 <body>
+<button id="themeToggle" aria-label="다크/라이트 모드 전환" title="다크/라이트 모드 전환">🌙</button>
 <div class="wrap">
 
 <header>
@@ -373,5 +396,23 @@ footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--
 </footer>
 
 </div>
+<script>
+  (function () {
+    var btn = document.getElementById("themeToggle");
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    function current() {
+      return document.documentElement.dataset.theme || (mq.matches ? "dark" : "light");
+    }
+    function paint() { btn.textContent = current() === "dark" ? "☀️" : "🌙"; }
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("dogtor-theme", next);
+      paint();
+    });
+    mq.addEventListener("change", paint);
+    paint();
+  })();
+</script>
 </body>
 </html>
