@@ -53,9 +53,30 @@ a:hover { text-decoration: underline; }
 .nv .links a.active { color: var(--accent); border-bottom-color: var(--accent); }
 #themeToggle {
   flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
-  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  border: none; background: var(--ink); color: var(--bg);
   font-size: 15px; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.18);
+}
+
+/* 좌측 사이드 목차 (넓은 화면) */
+#sidenav { display: none; }
+@media (min-width: 1280px) {
+  #sidenav {
+    display: block; position: fixed; z-index: 15;
+    top: 96px; left: max(16px, calc(50% - 410px - 216px)); width: 188px;
+    font-size: 13.5px;
+  }
+  #sidenav a {
+    display: block; color: var(--sub); font-weight: 600;
+    padding: 6px 10px; border-left: 2px solid var(--line);
+  }
+  #sidenav a:hover { color: var(--ink); text-decoration: none; }
+  #sidenav a.active { color: var(--accent); border-left-color: var(--accent); }
+  #sidenav .n { color: var(--wait); font-weight: 600; margin-right: 7px;
+    font-variant-numeric: tabular-nums; }
+  #sidenav a.active .n { color: var(--accent); }
+  #topnav .links { visibility: hidden; }
 }
 
 header.hero { padding: 64px 0 8px; }
@@ -150,6 +171,16 @@ footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--
   </div>
 </nav>
 
+<aside id="sidenav" aria-label="목차">
+  <a href="#name"><span class="n">00</span>이름 이야기</a>
+  <a href="#why"><span class="n">01</span>문제 정의</a>
+  <a href="#arch"><span class="n">02</span>앱 아키텍처</a>
+  <a href="#status"><span class="n">03</span>구축 현황</a>
+  <a href="#hermes"><span class="n">04</span>헤르메스 하니스</a>
+  <a href="#insights"><span class="n">05</span>인사이트</a>
+  <a href="#log"><span class="n">06</span>빌드 로그</a>
+</aside>
+
 <div class="wrap" id="top">
 
 <header class="hero">
@@ -158,7 +189,6 @@ footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--
   <p class="lede">걷는 모습을 보고 아는 우리 개 주치의.
   반려견의 30초 보행 영상으로 관절과 슬개골 이상 신호를 확인하는
   온디바이스 iOS 앱을 만드는 기록이다.</p>
-  <p class="meta">Apple Developer Academy 러너 <a href="https://github.com/jsonpassion">@jsonpassion</a>, 2026년 8월 시작</p>
 </header>
 
 <section id="name">
@@ -258,29 +288,30 @@ footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--
 
 <section id="status">
   <h2><span class="num">03</span>구축 현황</h2>
-  <p class="section-lede">실데이터 없이 검증 가능한 전 구간을 먼저 끝냈다.</p>
+  <p class="section-lede">완료 표기는 실데이터와 실사용 검증까지 끝난 항목에만 쓴다.
+  지금 단계의 실체는 대부분 설계와 준비다. 그것을 그대로 적는다.</p>
 
   <div class="stats">
-    <div class="stat"><div class="n">0.986</div><div class="l">합성 검증 AUC. 심어둔 파행 신호를 학습 하네스가 복원</div></div>
-    <div class="stat"><div class="n">388KB</div><div class="l">Core ML 모델 크기 (iOS 17+)</div></div>
-    <div class="stat"><div class="n">14관절</div><div class="l">수의 골성 랜드마크 스키마, 비공개 문서에서 복원</div></div>
-    <div class="stat"><div class="n">100%</div><div class="l">민감도(2기 이상), 합성 신호 기준</div></div>
+    <div class="stat"><div class="n">0.986</div><div class="l">학습 하네스 검증 AUC. 단 합성 신호 기준, 실데이터 수치 아님</div></div>
+    <div class="stat"><div class="n">388KB</div><div class="l">Core ML 변환 산출물 크기. 가중치는 아직 무학습</div></div>
+    <div class="stat"><div class="n">14관절</div><div class="l">라벨 스키마 복원본. 실데이터 대조 검증 전</div></div>
+    <div class="stat"><div class="n">0건</div><div class="l">실제 강아지로 검증된 판정. 아직 하나도 없다</div></div>
   </div>
 
   <div class="scroll-x"><table>
-    <thead><tr><th>영역</th><th>내용</th><th style="width:110px">상태</th></tr></thead>
+    <thead><tr><th>영역</th><th>실체</th><th style="width:130px">상태</th></tr></thead>
     <tbody>
-    <tr><td>시장, 문제 검증</td><td>경쟁 지형 분석, 빈 포지션 확인, 슬개골 시장 근거 확보</td><td class="st ok">완료</td></tr>
-    <tr><td>데이터 스키마</td><td>AI Hub 보행 데이터셋 라벨 구조 복원 (14관절, 5등급, 다리별 좌우)</td><td class="st ok">완료</td></tr>
-    <tr><td>아키텍처</td><td>포즈와 시계열 분리 확정, 단계별 파인튜닝 계획과 게이트 수립</td><td class="st ok">완료</td></tr>
-    <tr><td>백본 선정</td><td>후보 6종 정량 비교로 RTMPose-m 본선, YOLO11 백업, ViTPose teacher 확정</td><td class="st ok">완료</td></tr>
-    <tr><td>파이프라인</td><td>포즈 추출 CLI, 파서, 학습, 평가 리포트. 합성 신호 복원 검증</td><td class="st ok">완료</td></tr>
-    <tr><td>iOS 앱</td><td>촬영, 온디바이스 분석, 3단계 결과, 공유 카드. 시뮬레이터 검증</td><td class="st ok">완료</td></tr>
-    <tr><td>와이어프레임</td><td>7화면 컨셉 확정. 동물병원 연계 기능을 화면에 내장</td><td class="st ok">완료</td></tr>
-    <tr><td>헤르메스 하니스</td><td>로컬 기억 시스템 구축과 보안 점검 (04절)</td><td class="st ok">완료</td></tr>
-    <tr><td>실데이터 학습</td><td>AI Hub 데이터 수령 후 서버 학습, 평가 게이트 판정</td><td class="st wip">준비 중</td></tr>
-    <tr><td>실기기 검증</td><td>실제 강아지 촬영 검증, TestFlight</td><td class="st wait">대기</td></tr>
-    <tr><td>출시</td><td>한국 우선, 이후 미국 검토</td><td class="st wait">대기</td></tr>
+    <tr><td>시장, 문제 정의</td><td>경쟁과 시장 리서치 완료. 실사용자 검증(인터뷰, 테스트)은 하지 않음</td><td class="st wip">리서치만 완료</td></tr>
+    <tr><td>데이터 스키마</td><td>공개 자료 판독으로 복원. 실데이터를 아직 받지 못해 가정 5개가 미검증</td><td class="st wip">복원, 검증 대기</td></tr>
+    <tr><td>아키텍처, 백본</td><td>포즈와 시계열 분리, RTMPose-m 본선까지 결정. MPS 학습 스모크 테스트 전</td><td class="st wip">결정, 실증 전</td></tr>
+    <tr><td>학습 파이프라인</td><td>코드 완성, 합성 신호 복원(AUC 0.986)만 확인. 실데이터는 0장</td><td class="st wip">합성 검증만</td></tr>
+    <tr><td>iOS 앱</td><td>화면 골격과 온디바이스 추론 경로. 학습된 모델 없음, 실기기와 실견 테스트 없음</td><td class="st wip">스캐폴드</td></tr>
+    <tr><td>와이어프레임</td><td>7화면 컨셉 v1. 사용자에게 보여준 적 없음</td><td class="st wip">v1 초안</td></tr>
+    <tr><td>헤르메스 하니스</td><td>구축, 동작 검증, 보안 점검까지 완료</td><td class="st ok">완료</td></tr>
+    <tr><td>여정 사이트</td><td>운영 중, 계속 갱신</td><td class="st ok">운영 중</td></tr>
+    <tr><td>실데이터 학습</td><td>데이터 신청과 서버 연결이 선행 조건</td><td class="st wait">시작 전</td></tr>
+    <tr><td>실기기 검증, TestFlight</td><td></td><td class="st wait">시작 전</td></tr>
+    <tr><td>출시</td><td>한국 우선</td><td class="st wait">시작 전</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -349,7 +380,8 @@ footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--
 
 <section id="insights">
   <h2><span class="num">05</span>인사이트</h2>
-  <p class="section-lede">여기까지 오면서 배운 것 다섯 가지.</p>
+  <p class="section-lede">여정에서 배운 것을 스토리로 쌓아간다. 아래는 2026년 8월,
+  첫 준비 구간의 기록이다.</p>
 
   <div class="insight"><h3>1. 시장이 좁힌 문제가 모델을 살린다</h3>
   <p>슬개골에서 시작한 것은 의학이 아니라 시장의 결정이었다. 한국 인기 견종 상위권이
@@ -430,21 +462,26 @@ footer { text-align: center; padding: 28px 0 8px; font-size: 14px; color: var(--
     paint();
   })();
 
-  // 스크롤 스파이: 현재 섹션의 내비 링크에 언더라인
+  // 스크롤 스파이: 상단 내비와 좌측 목차 모두에 현재 섹션 표시
   (function () {
-    var links = Array.prototype.slice.call(document.querySelectorAll("#navlinks a"));
+    var links = Array.prototype.slice.call(document.querySelectorAll("#navlinks a, #sidenav a"));
     var byId = {};
-    links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+    links.forEach(function (a) {
+      var id = a.getAttribute("href").slice(1);
+      (byId[id] = byId[id] || []).push(a);
+    });
     var sections = Object.keys(byId).map(function (id) { return document.getElementById(id); });
     var activeId = null;
     function setActive(id) {
       if (id === activeId) return;
       activeId = id;
       links.forEach(function (a) { a.classList.remove("active"); });
-      if (id && byId[id]) {
-        byId[id].classList.add("active");
-        byId[id].scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
-      }
+      (byId[id] || []).forEach(function (a) {
+        a.classList.add("active");
+        if (a.closest("#navlinks")) {
+          a.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+        }
+      });
     }
     var observer = new IntersectionObserver(function () {
       var nav = document.getElementById("topnav").offsetHeight;
