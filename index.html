@@ -181,6 +181,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
     <div class="links" id="navlinks">
       <a href="#name">이름</a>
       <a href="#why">문제 정의</a>
+      <a href="#market">시장 현실</a>
       <a href="#arch">아키텍처</a>
       <a href="#status">구축 현황</a>
       <a href="#hermes">헤르메스</a>
@@ -194,11 +195,12 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 <aside id="sidenav" aria-label="목차">
   <a href="#name"><span class="n">00</span>이름 이야기</a>
   <a href="#why"><span class="n">01</span>문제 정의</a>
-  <a href="#arch"><span class="n">02</span>앱 아키텍처</a>
-  <a href="#status"><span class="n">03</span>구축 현황</a>
-  <a href="#hermes"><span class="n">04</span>헤르메스 하니스</a>
-  <a href="#insights"><span class="n">05</span>인사이트</a>
-  <a href="#log"><span class="n">06</span>빌드 로그</a>
+  <a href="#market"><span class="n">02</span>시장 현실</a>
+  <a href="#arch"><span class="n">03</span>앱 아키텍처</a>
+  <a href="#status"><span class="n">04</span>구축 현황</a>
+  <a href="#hermes"><span class="n">05</span>헤르메스 하니스</a>
+  <a href="#insights"><span class="n">06</span>인사이트</a>
+  <a href="#log"><span class="n">07</span>빌드 로그</a>
 </aside>
 
 <div class="wrap" id="top">
@@ -237,8 +239,53 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
   보험금 지급액 1위 질환이다. 걱정의 크기와 시장이 정확히 겹친다.</div>
 </section>
 
-<section id="arch">
+<section id="market">
   <div class="ch">Ch. 02</div>
+  <h2>시장의 실제 숫자</h2>
+  <p class="section-lede">시장 보고서의 조 단위 전망 대신, 같은 일을 하는 회사들이
+  실제로 벌어들인 돈을 기준선으로 삼았다. 결론은 냉정하다.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">-78.5억</div><div class="l">국내 선두 앱의 2024년 영업손실. 같은 해 매출은 36.4억 원이었다</div></div>
+    <div class="stat"><div class="n">1,400원</div><div class="l">가장 유사한 서비스의 회원 1인당 연매출 추정치</div></div>
+    <div class="stat"><div class="n">492달러</div><div class="l">구독 앱 월매출 중앙값. 상위 10퍼센트가 전체의 94.5퍼센트를 가져간다</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">하드웨어 없는 순수 AI 스크리닝으로 미국에서 성공한 사례</div></div>
+  </div>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th>사례</th><th>공개된 실적</th></tr></thead>
+    <tbody>
+    <tr><td>티티케어(에이아이포펫)</td><td>2024년 매출 36.4억 원에 영업손실 78.5억 원. 2025년 매출은 18.1억 원으로 반토막. 5년간 누적 손실 200억 원 이상</td></tr>
+    <tr><td>라이펫(십일리터)</td><td>회원 8만 명, 2024년 매출 1.11억 원. 슬개골 탈구 AI 분석이라는 점에서 가장 가까운 서비스다</td></tr>
+    <tr><td>핏펫</td><td>2023년 매출 239억 원에서 2024년 163억 원으로 역성장. 헬스케어를 앞세웠으나 매출은 커머스에서 나온다</td></tr>
+    <tr><td>Whistle (미국)</td><td>Mars가 1.17억 달러에 인수했으나 2025년 8월 서비스를 완전히 종료했다</td></tr>
+    <tr><td>Tractive (대조군)</td><td>구독자 130만 명, 연 반복매출 1억 유로. 핵심 가치는 건강 모니터링이 아니라 분실 방지다</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="insight"><h3>사용자를 모으는 일과 돈을 받는 일은 다른 문제다</h3>
+  <p>회원 8만 명을 모은 서비스의 연매출이 1.11억 원이었다. 회원 한 명이 한 해에
+  1,400원을 만들어낸 셈이다. 이 카테고리에서 가입자 수는 수익의 예고편이 아니다.</p></div>
+
+  <div class="insight"><h3>Whistle이 죽은 이유는 하드웨어가 아니라 지속 사용 이유의 부재다</h3>
+  <p>세계 최대 펫 기업의 자본으로도 10년을 넘기지 못했다. 반대로 구독자 130만 명을
+  모은 Tractive의 무기는 건강 인사이트가 아니라 <b>개를 잃어버리지 않는다</b>는 매일의
+  절박함이었다. 보행 스크리닝은 결과가 정상일수록 앱을 열 이유가 사라지는 구조다.</p></div>
+
+  <div class="insight"><h3>그래서 순서를 뒤집었다</h3>
+  <p>구독을 첫 수익원으로 잡지 않는다. 무료 스크리닝으로 신뢰와 데이터를 쌓고,
+  이상 소견을 병원 방문으로 잇는 리퍼럴을 만들고, 그다음에 보험사와의 공동 설계로
+  간다. 국내 반려동물병원 4,159곳 가운데 71.8퍼센트가 1인 병원이므로 고가 소프트웨어를
+  파는 접근은 성립하지 않는다. 구독은 존재해야 하는 수익원이지 계획을 지탱하는
+  수익원이 아니다.</p></div>
+
+  <p>목표 수치도 시장 보고서가 아니라 이 표에서 가져왔다. 유사 앱의 1년차 실적과
+  구독 앱 매출 분포를 기준으로 밴드를 잡았고, 그 밴드는 낙관적이지 않다.
+  이 숫자들을 먼저 본 것이 이 프로젝트의 방향을 바꿨다.</p>
+</section>
+
+<section id="arch">
+  <div class="ch">Ch. 03</div>
   <h2>앱 아키텍처</h2>
   <p class="section-lede">포즈 추정(공간)과 경량 시계열(시간)을 분리했다. 전부 기기 안에서 실행된다.</p>
 
@@ -310,7 +357,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 </section>
 
 <section id="status">
-  <div class="ch">Ch. 03</div>
+  <div class="ch">Ch. 04</div>
   <h2>구축 현황</h2>
   <p class="section-lede">완료 표기는 실데이터와 실사용 검증까지 끝난 항목에만 쓴다.
   지금 단계의 실체는 대부분 설계와 준비다. 그것을 그대로 적는다.</p>
@@ -341,7 +388,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 </section>
 
 <section id="hermes">
-  <div class="ch">Ch. 04</div>
+  <div class="ch">Ch. 05</div>
   <h2>헤르메스 하니스</h2>
   <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정, 스펙, 절차를
   자동으로 축적하는 로컬 기억 시스템을 만들었다.</p>
@@ -404,7 +451,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 </section>
 
 <section id="insights">
-  <div class="ch">Ch. 05</div>
+  <div class="ch">Ch. 06</div>
   <h2>인사이트</h2>
   <p class="section-lede">여정에서 배운 것을 스토리로 쌓아간다. 아래는 2026년 8월,
   첫 준비 구간의 기록이다.</p>
@@ -436,7 +483,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 </section>
 
 <section id="log">
-  <div class="ch">Ch. 06</div>
+  <div class="ch">Ch. 07</div>
   <h2>빌드 로그</h2>
   <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
   <div class="timeline">
@@ -456,6 +503,8 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
       <p>3층 기억 구조 내재화, 보안 점검(주입 방어, 도구 차단, 파일 권한)까지 완료. 사이트 리디자인.</p></div></div>
     <div class="tl"><div class="d">2026.08.14</div><div><h3>와이어프레임 확정, 백본 결정</h3>
       <p>병원 연계 3축을 화면에 내장한 7화면 컨셉. 백본은 후보 6종 정량 비교로 RTMPose-m 본선 확정. 원격 학습 스크립트와 실험 리더보드 체계 구축.</p></div></div>
+    <div class="tl"><div class="d">2026.08.19</div><div><h3>시장의 실제 숫자를 먼저 보다</h3>
+      <p>유사 앱의 공시와 실적을 조사해 기준선을 교체했다. 선두 사업자의 손익과 최유사 서비스의 회원당 매출을 확인한 뒤 수익원 순서를 구독에서 병원 연계로 뒤집었다.</p></div></div>
     <div class="tl future"><div class="d">NEXT</div><div><h3>실데이터 학습, 평가를 직접 판단</h3>
       <p>서버 학습 완주 후 민감도와 특이도 게이트 통과 여부를 스스로 판정하는 것이 다음 마일스톤.</p></div></div>
     <div class="tl future"><div class="d">THEN</div><div><h3>실기기 검증, TestFlight, 출시</h3>
