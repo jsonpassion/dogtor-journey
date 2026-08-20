@@ -3,169 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dogtor 독터, 반려견 보행 스크리닝</title>
-<meta name="description" content="반려견 30초 보행 영상으로 관절과 슬개골 이상 신호를 확인하는 온디바이스 iOS 앱. 학습부터 론칭까지의 기록.">
+<title>Dogtor 독터 — 걷는 모습을 보면 안다</title>
+<meta name="description" content="반려견의 30초 보행 영상으로 관절과 슬개골 이상 신호를 확인하는 온디바이스 iOS 앱. 학습부터 론칭까지의 기록.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐕</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #f7f5f1; --ink: #171512; --sub: #6f6a62; --accent: #0f62c8;
-  --line: #e2ded6; --soft: #efece6; --ok: #1d7a42; --wip: #a1590d; --wait: #938d83;
-  --sketch: #3d3933; --navbg: rgba(247,245,241,.88);
-  --serif: "Noto Serif KR", "Apple Myungjo", Georgia, serif;
-  --sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0b0a09; --ink: #eeeae3; --sub: #969086; --accent: #6ea8f0;
-    --line: #262320; --soft: #161412; --ok: #4cb572; --wip: #d99a4e; --wait: #6d675e;
-    --sketch: #b8b2a8; --navbg: rgba(11,10,9,.88);
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0b0a09; --ink: #eeeae3; --sub: #969086; --accent: #6ea8f0;
-  --line: #262320; --soft: #161412; --ok: #4cb572; --wip: #d99a4e; --wait: #6d675e;
-  --sketch: #b8b2a8; --navbg: rgba(11,10,9,.88);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg); color: var(--ink);
-  font-family: var(--sans); font-size: 16.5px; line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-}
-.wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 140px; }
-a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
-a:hover { text-decoration-color: var(--accent); }
-
-/* 상단 내비 */
-#topnav {
-  position: sticky; top: 0; z-index: 20;
-  background: var(--navbg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--line);
-}
-.nv { max-width: 720px; margin: 0 auto; padding: 0 24px;
-  display: flex; align-items: center; gap: 14px; height: 56px; }
-.nv .brand { font-family: var(--serif); font-weight: 600; font-size: 17px;
-  color: var(--ink); text-decoration: none; flex-shrink: 0; }
-.nv .links { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1; }
-.nv .links::-webkit-scrollbar { display: none; }
-.nv .links a {
-  flex-shrink: 0; color: var(--sub); font-size: 13px; font-weight: 600; text-decoration: none;
-  padding: 17px 10px 15px; border-bottom: 2px solid transparent; white-space: nowrap;
-}
-.nv .links a:hover { color: var(--ink); }
-.nv .links a.active { color: var(--ink); border-bottom-color: var(--ink); }
-#themeToggle {
-  flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
-  border: none; background: var(--ink); color: var(--bg);
-  font-size: 15px; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 1px 4px rgba(0,0,0,.18);
-}
-
-/* 좌측 레일 목차 */
-#sidenav { display: none; }
-@media (min-width: 1280px) {
-  #sidenav {
-    display: block; position: fixed; z-index: 15;
-    top: 110px; left: max(20px, calc(50% - 360px - 230px)); width: 200px;
-    font-size: 13px; border-left: 1px solid var(--line);
-  }
-  #sidenav a {
-    display: block; color: var(--sub); font-weight: 500; text-decoration: none;
-    padding: 7px 0 7px 16px; margin-left: -1px; border-left: 1px solid transparent;
-  }
-  #sidenav a:hover { color: var(--ink); }
-  #sidenav a.active { color: var(--ink); border-left-color: var(--ink); }
-  #sidenav .n { font-family: var(--serif); color: var(--wait); margin-right: 8px;
-    font-variant-numeric: tabular-nums; font-size: 12px; }
-  #sidenav a.active .n { color: var(--ink); }
-  #topnav .links { visibility: hidden; }
-}
-
-/* 히어로: 선언형 에디토리얼 */
-header.hero { padding: 17vh 0 10vh; }
-.kicker { font-size: 12.5px; font-weight: 700; letter-spacing: .16em; color: var(--sub); }
-h1 {
-  font-family: var(--serif); font-weight: 400;
-  font-size: clamp(44px, 8.5vw, 76px); line-height: 1.18; letter-spacing: -0.022em;
-  margin: 26px 0 30px;
-}
-h1 em { font-style: normal; color: var(--sub); }
-.lede { font-size: 18.5px; color: var(--sub); max-width: 560px; line-height: 1.8; }
-.hero-rule { border: none; border-top: 1px solid var(--line); margin-top: 10vh; }
-
-/* 섹션: 챕터 구조 */
-section { margin-top: 130px; scroll-margin-top: 80px; }
-.ch { font-family: var(--serif); font-size: 13.5px; color: var(--sub);
-  letter-spacing: .04em; margin-bottom: 14px; }
-h2 {
-  font-family: var(--serif); font-weight: 400;
-  font-size: clamp(32px, 5.4vw, 46px); line-height: 1.24; letter-spacing: -0.018em;
-}
-.section-lede { color: var(--sub); margin: 18px 0 34px; max-width: 560px; }
-h3 { font-size: 17px; font-weight: 700; margin: 30px 0 10px; }
-p + p { margin-top: 13px; }
-b { font-weight: 700; }
-
-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin: 18px 0; }
-th, td { text-align: left; padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .08em; }
-.scroll-x { overflow-x: auto; }
-
-.callout {
-  border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line);
-  padding: 22px 0; margin: 34px 0; font-size: 16px; line-height: 1.8;
-}
-.callout b { font-family: var(--serif); font-weight: 600; }
-
-/* 큰 숫자 스탯: 에디토리얼 */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0; margin: 34px 0; border-top: 1px solid var(--ink); }
-.stat { padding: 22px 18px 22px 0; border-bottom: 1px solid var(--line); }
-.stat .n { font-family: var(--serif); font-weight: 400;
-  font-size: clamp(34px, 4.5vw, 44px); letter-spacing: -0.02em; line-height: 1.1; }
-.stat .l { font-size: 13px; color: var(--sub); margin-top: 8px; line-height: 1.55; }
-
-.st { font-weight: 700; font-size: 13px; white-space: nowrap; }
-.st.ok::before { content: "● "; } .st.wip::before { content: "◐ "; } .st.wait::before { content: "○ "; }
-.st.ok { color: var(--ok); } .st.wip { color: var(--wip); } .st.wait { color: var(--wait); }
-
-figure.sketch { margin: 34px 0; }
-figure.sketch svg { width: 100%; height: auto; display: block; }
-figure.sketch figcaption { font-family: var(--serif); font-size: 13.5px; color: var(--sub);
-  margin-top: 12px; }
-.sk-box { fill: var(--bg); stroke: var(--sketch); stroke-width: 1.6; }
-.sk-soft { fill: var(--soft); stroke: var(--sketch); stroke-width: 1.6; }
-.sk-hi { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 7 5; }
-.sk-arrow { stroke: var(--sketch); stroke-width: 1.6; fill: none; marker-end: url(#arr); }
-.sk-t { font-size: 13px; font-weight: 700; fill: var(--ink); }
-.sk-s { font-size: 11px; fill: var(--sub); }
-.sk-a { font-size: 11.5px; font-weight: 700; fill: var(--accent); }
-
-/* 타임라인 */
-.timeline { margin-top: 26px; }
-.tl { display: grid; grid-template-columns: 96px 1fr; gap: 18px;
-  padding: 20px 0; border-top: 1px solid var(--line); }
-.tl .d { font-family: var(--serif); font-size: 13.5px; color: var(--sub); padding-top: 3px; }
-.tl.future .d { color: var(--wait); }
-.tl h3 { font-size: 16.5px; margin: 0 0 4px; }
-.tl.future h3 { color: var(--sub); }
-.tl p { font-size: 14.5px; color: var(--sub); }
-
-/* 인사이트: FAQ형 에디토리얼 */
-.insight { padding: 26px 0; border-top: 1px solid var(--line); }
-.insight h3 { font-family: var(--serif); font-weight: 600; font-size: 21px;
-  line-height: 1.4; margin: 0 0 10px; }
-.insight p { font-size: 15.5px; color: var(--sub); }
-.insight p b { color: var(--ink); }
-
-.note { margin-top: 120px; border-top: 1px solid var(--ink); padding-top: 26px;
-  font-size: 13.5px; color: var(--sub); }
-footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <script>
   (function () {
     var t = localStorage.getItem("dogtor-theme");
@@ -175,398 +19,98 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 </head>
 <body>
 
-<nav id="topnav" aria-label="섹션 이동">
-  <div class="nv">
-    <a class="brand" href="#top">Dogtor</a>
-    <div class="links" id="navlinks">
-      <a href="#name">이름</a>
-      <a href="#why">문제 정의</a>
-      <a href="#market">시장 현실</a>
-      <a href="#arch">아키텍처</a>
-      <a href="#status">구축 현황</a>
-      <a href="#hermes">헤르메스</a>
-      <a href="#insights">인사이트</a>
-      <a href="#stuck">막힌 지점</a>
-      <a href="#log">빌드 로그</a>
-    </div>
-    <button id="themeToggle" aria-label="다크 라이트 모드 전환" title="다크 라이트 모드 전환">🌙</button>
-  </div>
-</nav>
+<div id="topbar"><div class="tb">
+  <a class="brand" href="index.html">Dogtor</a>
+  <span class="spacer"></span>
+  <a class="nav on" href="index.html">개요</a>
+  <a class="nav" href="pipeline.html">파이프라인 해부</a>
+  <button id="themeToggle" aria-label="다크 라이트 전환" title="다크 라이트 전환">🌙</button>
+</div></div>
 
-<aside id="sidenav" aria-label="목차">
-  <a href="#name"><span class="n">00</span>이름 이야기</a>
-  <a href="#why"><span class="n">01</span>문제 정의</a>
-  <a href="#market"><span class="n">02</span>시장 현실</a>
-  <a href="#arch"><span class="n">03</span>앱 아키텍처</a>
-  <a href="#status"><span class="n">04</span>구축 현황</a>
-  <a href="#hermes"><span class="n">05</span>헤르메스 하니스</a>
-  <a href="#insights"><span class="n">06</span>인사이트</a>
-  <a href="#stuck"><span class="n">07</span>막힌 지점들</a>
-  <a href="#log"><span class="n">08</span>빌드 로그</a>
-</aside>
-
-<div class="wrap" id="top">
+<div class="wrap">
 
 <header class="hero">
-  <div class="kicker">BUILD IN PUBLIC 🐕</div>
-  <h1>걷는 모습을 보면<br>안다.</h1>
-  <p class="lede">반려견의 30초 보행 영상으로 관절과 슬개골 이상 신호를 확인하는
-  온디바이스 iOS 앱, 독터 Dogtor. 학습부터 론칭까지 과정을 그대로 기록한다.</p>
-  <hr class="hero-rule">
+  <span class="kicker">iOS / 온디바이스 / 스크리닝</span>
+  <h1>걷는 모습을<br>보면 안다</h1>
+  <p class="lede">반려견의 걸음걸이를 30초 찍으면 관절과 슬개골의 이상 신호를 살펴본다.
+  영상은 기기 밖으로 나가지 않는다. 진단이 아니라 <b>병원에 갈 때를 알려주는 눈</b>이다.</p>
+  <div class="btns">
+    <a class="btn primary" href="pipeline.html">파이프라인 해부 →</a>
+    <a class="btn ghost" href="https://github.com/jsonpassion">GitHub에서 보기</a>
+  </div>
 </header>
 
-<section id="name">
-  <div class="ch">Ch. 00</div>
-  <h2>이름 이야기</h2>
-  <p class="section-lede">doctor의 doc을 dog로 바꿨다. 한국어로 읽으면 독터, 닥터와 한 끗 차이다.</p>
-  <p>청진기 대신 카메라를 든 반려견 주치의라는 뜻이다. 이 이름에 도착하기까지
-  펫 닥터 포켓에서 출발해 후보 3라운드와 Dwag를 거쳤다. 네이밍의 시행착오도
-  여정의 일부이므로 그대로 남긴다.</p>
-</section>
+<section>
+  <div class="ch">01</div>
+  <h2>30초면 된다</h2>
+  <p class="section-lede">보호자가 하는 일은 옆에서 강아지가 걷는 모습을 찍는 것뿐이다.
+  나머지는 전부 기기 안에서 일어난다.</p>
 
-<section id="why">
-  <div class="ch">Ch. 01</div>
-  <h2>문제 정의</h2>
-  <p class="section-lede">Challenge Based Learning의 네 단계로 좁혔다.</p>
-  <div class="scroll-x"><table>
-    <tbody>
-    <tr><th style="width:128px">Big Idea</th><td>펫 헬스케어. 반려동물은 아픔을 말하지 못하므로, 보호자의 알아차림이 건강 수명을 결정한다.</td></tr>
-    <tr><th>Essential Question</th><td>말하지 못하는 반려견의 건강 이상을, 보호자는 어떻게 <b>너무 늦기 전에</b> 알아차릴 수 있는가.</td></tr>
-    <tr><th>Challenge</th><td>장비나 전문 지식 없이, 일상 속에서 이상 신호를 조기에 발견하도록 돕는다.</td></tr>
-    <tr><th>Refined</th><td><b>스마트폰으로 30초 걸음걸이를 찍는 것만으로</b> 소형견 보호자가 슬개골과 관절의 신호를 발견하고 <b>매달 변화를 추적</b>하게 한다.</td></tr>
-    </tbody>
-  </table></div>
-  <div class="callout"><b>왜 슬개골인가.</b> 한국 인기 견종 상위권(말티즈, 푸들, 포메라니안, 비숑, 치와와)이
-  모두 슬개골 탈구 고위험군이다. 소형견 4~5마리 중 1마리가 겪는 것으로 추정되며
-  보험금 지급액 1위 질환이다. 걱정의 크기와 시장이 정확히 겹친다.</div>
-</section>
-
-<section id="market">
-  <div class="ch">Ch. 02</div>
-  <h2>시장의 실제 숫자</h2>
-  <p class="section-lede">시장 보고서의 조 단위 전망 대신, 같은 일을 하는 회사들이
-  실제로 벌어들인 돈을 기준선으로 삼았다. 결론은 냉정하다.</p>
-
-  <div class="stats">
-    <div class="stat"><div class="n">-78.5억</div><div class="l">국내 선두 앱의 2024년 영업손실. 같은 해 매출은 36.4억 원이었다</div></div>
-    <div class="stat"><div class="n">1,400원</div><div class="l">가장 유사한 서비스의 회원 1인당 연매출 추정치</div></div>
-    <div class="stat"><div class="n">492달러</div><div class="l">구독 앱 월매출 중앙값. 상위 10퍼센트가 전체의 94.5퍼센트를 가져간다</div></div>
-    <div class="stat"><div class="n">0</div><div class="l">하드웨어 없는 순수 AI 스크리닝으로 미국에서 성공한 사례</div></div>
+  <div class="cards">
+    <div class="card"><h3>촬영</h3>
+      <p>측면에서 30초. 간식으로 총총 걷게 유도한다. 빠른 걸음이 파행을 가장 잘 드러낸다는
+      수의 보행분석의 원칙을 그대로 쓴다.</p></div>
+    <div class="card"><h3>분석</h3>
+      <p>관절 위치를 프레임마다 추적해 궤적으로 바꾸고, 좌우 대칭과 리듬의 붕괴를 읽는다.
+      서버로 보내지 않는다.</p></div>
+    <div class="card"><h3>결과</h3>
+      <p>정상 범위, 관찰 필요, 상담 권장 세 단계. 어느 다리 쪽 신호인지까지 보여주고
+      매달 변화를 추적한다.</p></div>
   </div>
 
-  <div class="scroll-x"><table>
-    <thead><tr><th>사례</th><th>공개된 실적</th></tr></thead>
-    <tbody>
-    <tr><td>티티케어(에이아이포펫)</td><td>2024년 매출 36.4억 원에 영업손실 78.5억 원. 2025년 매출은 18.1억 원으로 반토막. 5년간 누적 손실 200억 원 이상</td></tr>
-    <tr><td>라이펫(십일리터)</td><td>회원 8만 명, 2024년 매출 1.11억 원. 슬개골 탈구 AI 분석이라는 점에서 가장 가까운 서비스다</td></tr>
-    <tr><td>핏펫</td><td>2023년 매출 239억 원에서 2024년 163억 원으로 역성장. 헬스케어를 앞세웠으나 매출은 커머스에서 나온다</td></tr>
-    <tr><td>Whistle (미국)</td><td>Mars가 1.17억 달러에 인수했으나 2025년 8월 서비스를 완전히 종료했다</td></tr>
-    <tr><td>Tractive (대조군)</td><td>구독자 130만 명, 연 반복매출 1억 유로. 핵심 가치는 건강 모니터링이 아니라 분실 방지다</td></tr>
-    </tbody>
-  </table></div>
-
-  <div class="insight"><h3>사용자를 모으는 일과 돈을 받는 일은 다른 문제다</h3>
-  <p>회원 8만 명을 모은 서비스의 연매출이 1.11억 원이었다. 회원 한 명이 한 해에
-  1,400원을 만들어낸 셈이다. 이 카테고리에서 가입자 수는 수익의 예고편이 아니다.</p></div>
-
-  <div class="insight"><h3>Whistle이 죽은 이유는 하드웨어가 아니라 지속 사용 이유의 부재다</h3>
-  <p>세계 최대 펫 기업의 자본으로도 10년을 넘기지 못했다. 반대로 구독자 130만 명을
-  모은 Tractive의 무기는 건강 인사이트가 아니라 <b>개를 잃어버리지 않는다</b>는 매일의
-  절박함이었다. 보행 스크리닝은 결과가 정상일수록 앱을 열 이유가 사라지는 구조다.</p></div>
-
-  <div class="insight"><h3>그래서 순서를 뒤집었다</h3>
-  <p>구독을 첫 수익원으로 잡지 않는다. 무료 스크리닝으로 신뢰와 데이터를 쌓고,
-  이상 소견을 병원 방문으로 잇는 리퍼럴을 만들고, 그다음에 보험사와의 공동 설계로
-  간다. 국내 반려동물병원 4,159곳 가운데 71.8퍼센트가 1인 병원이므로 고가 소프트웨어를
-  파는 접근은 성립하지 않는다. 구독은 존재해야 하는 수익원이지 계획을 지탱하는
-  수익원이 아니다.</p></div>
-
-  <p>목표 수치도 시장 보고서가 아니라 이 표에서 가져왔다. 유사 앱의 1년차 실적과
-  구독 앱 매출 분포를 기준으로 밴드를 잡았고, 그 밴드는 낙관적이지 않다.
-  이 숫자들을 먼저 본 것이 이 프로젝트의 방향을 바꿨다.</p>
+  <div class="callout">스크리닝 앱의 최대 위협은 놓치는 것보다 <b>겁주는 것</b>이다.
+  이상 신호를 남발하면 병원에서 정상 판정을 받은 보호자가 떠난다. 그래서 임계값을
+  특이도 우선으로 잡고, 촬영 품질이 낮으면 판정 대신 재촬영을 안내한다.</div>
 </section>
 
-<section id="arch">
-  <div class="ch">Ch. 03</div>
-  <h2>앱 아키텍처</h2>
-  <p class="section-lede">포즈 추정(공간)과 경량 시계열(시간)을 분리했다. 전부 기기 안에서 실행된다.</p>
-
-  <figure class="sketch">
-  <svg viewBox="0 0 760 300" role="img" aria-label="독터 온디바이스 파이프라인 다이어그램">
-    <defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
-      <path d="M1,1 L8,4.5 L1,8" fill="none" stroke="var(--sketch)" stroke-width="1.4"/></marker></defs>
-    <rect x="8" y="14" width="744" height="210" rx="14" class="sk-hi"/>
-    <text x="26" y="40" class="sk-a">📱 온디바이스, 영상은 폰 밖으로 나가지 않는다</text>
-
-    <g transform="translate(26,62) rotate(-0.4)">
-      <rect width="126" height="76" rx="10" class="sk-soft"/>
-      <text x="14" y="30" class="sk-t">30초 촬영</text>
-      <text x="14" y="50" class="sk-s">측면, 빠른 걸음</text>
-      <text x="14" y="65" class="sk-s">가이드 오버레이</text>
-    </g>
-    <line x1="156" y1="100" x2="196" y2="100" class="sk-arrow"/>
-
-    <g transform="translate(200,62) rotate(0.4)">
-      <rect width="140" height="76" rx="10" class="sk-box"/>
-      <text x="14" y="30" class="sk-t">Vision 포즈 추출</text>
-      <text x="14" y="50" class="sk-s">Apple 내장, 25관절</text>
-      <text x="14" y="65" class="sk-s">15fps 샘플링</text>
-    </g>
-    <line x1="344" y1="100" x2="384" y2="100" class="sk-arrow"/>
-
-    <g transform="translate(388,62) rotate(-0.3)">
-      <rect width="140" height="76" rx="10" class="sk-box"/>
-      <text x="14" y="30" class="sk-t">궤적 정규화</text>
-      <text x="14" y="50" class="sk-s">몸통 중심, 크기 불변</text>
-      <text x="14" y="65" class="sk-s">14관절 150프레임</text>
-    </g>
-    <line x1="532" y1="100" x2="572" y2="100" class="sk-arrow"/>
-
-    <g transform="translate(576,62) rotate(0.5)">
-      <rect width="150" height="76" rx="10" class="sk-soft"/>
-      <text x="14" y="30" class="sk-t">TCN 분류기</text>
-      <text x="14" y="50" class="sk-s">185K 파라미터, 388KB</text>
-      <text x="14" y="65" class="sk-s">Core ML, ANE</text>
-    </g>
-
-    <line x1="651" y1="142" x2="651" y2="168" class="sk-arrow"/>
-    <g transform="translate(420,172)">
-      <rect width="306" height="44" rx="10" class="sk-box"/>
-      <text x="14" y="20" class="sk-t">결과 3단계</text>
-      <text x="14" y="35" class="sk-s">정상 범위, 관찰 필요, 상담 권장. 수의사 상담 프레임 유지</text>
-    </g>
-    <line x1="416" y1="194" x2="376" y2="194" class="sk-arrow" transform="rotate(180 396 194)"/>
-    <g transform="translate(66,172) rotate(-0.4)">
-      <rect width="300" height="44" rx="10" class="sk-soft"/>
-      <text x="14" y="20" class="sk-t">공유 카드, 월간 추적</text>
-      <text x="14" y="35" class="sk-s">공유는 무료 무제한, 바이럴 루프의 자산</text>
-    </g>
-
-    <text x="26" y="262" class="sk-s">학습(서버): AI Hub 보행영상 2,094건과 압력센서 정답지. 같은 Vision 궤적 경로로 학습해 추론 분포와 일치시킨다</text>
-    <text x="26" y="282" class="sk-s">v2 계획: 자체 포즈 모델 풀 파인튜닝(126,092 라벨 프레임). 장모 소형견 특화가 해자</text>
-  </svg>
-  <figcaption>그림 1. 독터 파이프라인. 점선 안이 전부 기기 위에서 실행된다.</figcaption>
-  </figure>
-
-  <div class="scroll-x"><table>
-    <thead><tr><th>선택</th><th>이유</th></tr></thead>
-    <tbody>
-    <tr><td>포즈와 시계열 분리 (비디오 분류 기각)</td><td>keypoint가 외형과 배경을 지워 촬영 환경 변화에 강하고, 2천여 영상으로도 학습이 성립한다.</td></tr>
-    <tr><td>Vision 내장 포즈로 시작</td><td>무료, 온디바이스, 즉시 사용 가능. 해자는 포즈가 아니라 그 위의 파행 분류와 종단 데이터에 있다.</td></tr>
-    <tr><td>특이도 우선 임계값</td><td>스크리닝의 최대 리스크는 위양성이다. 병원에 갔는데 정상이라는 경험이 반복되면 신뢰가 무너진다.</td></tr>
-    </tbody>
-  </table></div>
-
-  <p>학습은 통합메모리 192GiB에 24코어인 Apple Silicon 워크스테이션에서 원격으로 수행한다.
-  메모리가 넉넉해 배치 크기에 제약이 없고, 온디바이스에 올릴 수 없는 큰 모델을 교사로 세워
-  정확도의 상한을 재는 실험까지 가능하다. 다만 같은 연산량 기준으로 전용 GPU보다 느리므로
-  학습 시간은 넉넉히 잡는다.</p>
+<section>
+  <div class="ch">02</div>
+  <h2>왜 슬개골인가</h2>
+  <p class="section-lede">의학이 아니라 시장이 정해준 출발점이다.</p>
+  <p>한국에서 많이 기르는 견종 상위권인 말티즈, 푸들, 포메라니안, 비숑, 치와와가
+  모두 슬개골 탈구 고위험군이다. 소형견 네다섯 마리 중 한 마리가 겪는 것으로 추정되고
+  펫보험 지급액 1위 질환이다. <b>걱정의 크기와 시장이 정확히 겹친다.</b></p>
+  <p>게다가 이 병은 관찰 구간이 길다. 수술을 권하기 전 단계에서 보호자는 몇 달을
+  불안하게 지켜본다. 매달 찍어 변화를 비교하는 일이 자연스럽게 필요해지는 구조다.</p>
 </section>
 
-<section id="status">
-  <div class="ch">Ch. 04</div>
-  <h2>구축 현황</h2>
+<section>
+  <div class="ch">03</div>
+  <h2>지금 어디까지</h2>
   <p class="section-lede">완료 표기는 실데이터와 실사용 검증까지 끝난 항목에만 쓴다.
-  지금 단계의 실체는 대부분 설계와 준비다. 그것을 그대로 적는다.</p>
+  지금 단계의 실체는 대부분 설계와 준비다.</p>
 
   <div class="stats">
-    <div class="stat"><div class="n">0.986</div><div class="l">학습 하네스 검증 AUC. 단 합성 신호 기준, 실데이터 수치 아님</div></div>
-    <div class="stat"><div class="n">388KB</div><div class="l">Core ML 변환 산출물 크기. 가중치는 아직 무학습</div></div>
-    <div class="stat"><div class="n">14</div><div class="l">복원한 골성 랜드마크 수. 실데이터 대조 검증 전</div></div>
-    <div class="stat"><div class="n">0</div><div class="l">실제 강아지로 검증된 판정 건수. 아직 하나도 없다</div></div>
+    <div class="stat"><span class="num">0.986</span>
+      <span class="lbl">학습 하네스 검증 AUC. 합성 신호 기준이며 실데이터 수치가 아니다</span></div>
+    <div class="stat"><span class="num">388KB</span>
+      <span class="lbl">온디바이스 분류기 크기. 가중치는 아직 학습 전이다</span></div>
+    <div class="stat"><span class="num">14</span>
+      <span class="lbl">복원한 골성 랜드마크 수. 실데이터 대조는 아직이다</span></div>
+    <div class="stat"><span class="num">0</span>
+      <span class="lbl">실제 강아지로 검증된 판정 건수. 아직 하나도 없다</span></div>
   </div>
 
   <div class="scroll-x"><table>
-    <thead><tr><th>영역</th><th>실체</th><th style="width:128px">상태</th></tr></thead>
     <tbody>
-    <tr><td>시장, 문제 정의</td><td>경쟁과 시장 리서치 완료. 실사용자 검증(인터뷰, 테스트)은 하지 않음</td><td class="st wip">리서치만 완료</td></tr>
-    <tr><td>데이터 스키마</td><td>공개 자료 판독으로 복원. 데이터 이용 승인은 받았고 실데이터 대조는 아직</td><td class="st wip">복원, 검증 대기</td></tr>
-    <tr><td>아키텍처, 백본</td><td>포즈와 시계열 분리, 배포 모델까지 결정. 학습 환경에서의 실증은 전</td><td class="st wip">결정, 실증 전</td></tr>
-    <tr><td>학습 환경</td><td>원격 워크스테이션에 코드와 실행 환경 구성 완료. 데이터 이용 승인 확보</td><td class="st ok">완료</td></tr>
-    <tr><td>결과 회수 경로</td><td>서버에서 로컬로 단방향만. 데이터셋은 읽는 경로에 없어 구조적으로 차단</td><td class="st ok">완료</td></tr>
-    <tr><td>학습 파이프라인</td><td>코드 완성, 합성 신호 복원(AUC 0.986)만 확인. 실데이터는 0장</td><td class="st wip">합성 검증만</td></tr>
-    <tr><td>iOS 앱</td><td>화면 골격과 온디바이스 추론 경로. 학습된 모델 없음, 실기기와 실견 테스트 없음</td><td class="st wip">스캐폴드</td></tr>
-    <tr><td>와이어프레임</td><td>7화면 컨셉 v1. 사용자에게 보여준 적 없음</td><td class="st wip">v1 초안</td></tr>
-    <tr><td>헤르메스 하니스</td><td>구축, 동작 검증, 보안 점검까지 완료</td><td class="st ok">완료</td></tr>
-    <tr><td>여정 사이트</td><td>운영 중, 계속 갱신</td><td class="st ok">운영 중</td></tr>
-    <tr><td>실데이터 학습</td><td>데이터 내려받기와 스키마 검증이 다음 차례</td><td class="st wip">착수</td></tr>
-    <tr><td>실기기 검증, TestFlight</td><td></td><td class="st wait">시작 전</td></tr>
-    <tr><td>출시</td><td>한국 우선</td><td class="st wait">시작 전</td></tr>
+    <tr><td>시장과 문제 정의</td><td class="st wip">리서치만 완료</td></tr>
+    <tr><td>데이터 스키마 복원</td><td class="st wip">검증 대기</td></tr>
+    <tr><td>아키텍처와 백본 결정</td><td class="st wip">실증 전</td></tr>
+    <tr><td>학습 파이프라인</td><td class="st wip">합성 검증만</td></tr>
+    <tr><td>학습 환경 구성</td><td class="st ok">완료</td></tr>
+    <tr><td>실데이터 학습</td><td class="st wip">착수</td></tr>
+    <tr><td>실기기 검증과 출시</td><td class="st wait">시작 전</td></tr>
     </tbody>
   </table></div>
 </section>
 
-<section id="hermes">
-  <div class="ch">Ch. 05</div>
-  <h2>헤르메스 하니스</h2>
-  <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정, 스펙, 절차를
-  자동으로 축적하는 로컬 기억 시스템을 만들었다.</p>
-
-  <figure class="sketch">
-  <svg viewBox="0 0 760 268" role="img" aria-label="헤르메스 기억 하니스 다이어그램">
-    <g transform="translate(24,20) rotate(-0.3)">
-      <rect width="150" height="64" rx="10" class="sk-soft"/>
-      <text x="14" y="26" class="sk-t">SOUL.md</text>
-      <text x="14" y="46" class="sk-s">페르소나, 불변 규칙</text>
-    </g>
-    <g transform="translate(24,102) rotate(0.4)">
-      <rect width="150" height="64" rx="10" class="sk-box"/>
-      <text x="14" y="26" class="sk-t">skills/*.md</text>
-      <text x="14" y="46" class="sk-s">절차 기억, 키워드 매칭</text>
-    </g>
-    <g transform="translate(24,184) rotate(-0.4)">
-      <rect width="150" height="64" rx="10" class="sk-box"/>
-      <text x="14" y="26" class="sk-t">state.db</text>
-      <text x="14" y="46" class="sk-s">에피소드, SQLite FTS5</text>
-    </g>
-
-    <line x1="178" y1="52" x2="288" y2="112" class="sk-arrow"/>
-    <line x1="178" y1="134" x2="288" y2="128" class="sk-arrow"/>
-    <line x1="178" y1="216" x2="288" y2="146" class="sk-arrow"/>
-
-    <g transform="translate(292,96) rotate(0.3)">
-      <rect width="170" height="70" rx="10" class="sk-soft"/>
-      <text x="14" y="28" class="sk-t">context 조립</text>
-      <text x="14" y="48" class="sk-s">임베딩 없이 키워드 검색</text>
-      <text x="14" y="62" class="sk-s">작업 세션에 첨부</text>
-    </g>
-
-    <line x1="466" y1="131" x2="546" y2="131" class="sk-arrow"/>
-    <g transform="translate(550,96) rotate(-0.4)">
-      <rect width="186" height="70" rx="10" class="sk-box"/>
-      <text x="14" y="28" class="sk-t">consolidate 증류</text>
-      <text x="14" y="48" class="sk-s">이벤트 N개 누적 시에만</text>
-      <text x="14" y="62" class="sk-s">보조 모델 호출, 구독 인증</text>
-    </g>
-
-    <path d="M 640 170 C 640 210, 420 236, 240 220" class="sk-arrow"/>
-    <g transform="translate(292,196) rotate(0.3)">
-      <rect width="170" height="52" rx="10" class="sk-soft"/>
-      <text x="14" y="22" class="sk-t">MEMORY.md</text>
-      <text x="14" y="40" class="sk-s">의미 기억, 내구 사실만</text>
-    </g>
-    <text x="560" y="206" class="sk-a">사실만 남기고 잡담은 버린다</text>
-
-    <text x="550" y="40" class="sk-a">보안 설계</text>
-    <text x="550" y="58" class="sk-s">보조 모델 도구 전면 차단 (주입 방어)</text>
-    <text x="550" y="74" class="sk-s">API 키 없음, 키체인 인증만</text>
-  </svg>
-  <figcaption>그림 2. 헤르메스. 표준 라이브러리만으로 만든 3층 기억 구조.</figcaption>
-  </figure>
-
-  <p>오픈소스 개인 에이전트 하니스들의 기억 설계에서 착안해 필요한 계층만
-  프로젝트 안에 내재화했다. 외부 의존성과 API 키가 없어 어디서든 실행되고,
-  증류는 이벤트가 쌓였을 때만 일어나 비용이 통제된다.</p>
-</section>
-
-<section id="insights">
-  <div class="ch">Ch. 06</div>
-  <h2>인사이트</h2>
-  <p class="section-lede">여정에서 배운 것을 스토리로 쌓아간다. 아래는 2026년 8월,
-  첫 준비 구간의 기록이다.</p>
-
-  <div class="insight"><h3>시장이 좁힌 문제가 모델을 살린다</h3>
-  <p>슬개골에서 시작한 것은 의학이 아니라 시장의 결정이었다. 한국 인기 견종 상위권이
-  전부 고위험군이라는 사실이 확인되는 순간 <b>타깃, 데이터, 질환이 한 점에서 만났다.</b>
-  범용 펫 헬스 AI였다면 아무것도 검증하지 못했을 것이다.</p></div>
-
-  <div class="insight"><h3>공개 페이지 뒤에 스키마가 숨어 있다</h3>
-  <p>데이터셋의 라벨 구조는 공개 페이지에 없었다. 구축기관의 발표 영상을 프레임 단위로
-  판독해 14개 해부학 랜드마크와 다리별 등급 구조를 복원했고, 이것이 <b>왼쪽 뒷다리 신호
-  라는 제품 기능</b>이 되었다. 리서치가 곧 기능 기획이었다.</p></div>
-
-  <div class="insight"><h3>등급 진단이 아니라 징후 감지다</h3>
-  <p>수의학 문헌상 탈구 등급은 촉진으로 판정하며 등급과 절뚝임의 상관은 약하다.
-  1기는 영상으로 원리상 거의 잡히지 않는다. 태스크를 <b>등급 진단에서 이상 징후 감지로
-  재정의</b>하자 모델 설계와 규제 리스크가 동시에 풀렸다.</p></div>
-
-  <div class="insight"><h3>위양성 관리가 UX이고 BM이다</h3>
-  <p>스크리닝 앱의 최대 위협은 놓치는 것보다 <b>겁주는 것</b>이다. 이상 신호를 남발하면
-  병원에서 정상 판정을 받은 사용자가 이탈한다. 임계값은 특이도 우선으로 캘리브레이션하고,
-  촬영 품질이 낮으면 판정 대신 재촬영을 안내한다. 언어, 임계값, UX 게이트가 한 체계다.</p></div>
-
-  <div class="insight"><h3>AI 협업의 경계선 두 줄</h3>
-  <p>이 프로젝트는 AI와 페어로 만든다. 지키는 원칙은 두 줄이다. <b>숫자를 만드는 일은 맡겨도
-  숫자를 읽고 결정하는 일은 내 몫이다. 화면을 만드는 일은 맡겨도 화면이 하는 말을 정하는
-  일은 내 몫이다.</b> 헤르메스는 그 결정들을 잊지 않기 위한 장치다.</p></div>
-</section>
-
-<section id="stuck">
-  <div class="ch">Ch. 07</div>
-  <h2>막힌 지점들</h2>
-  <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 기능이 아니라
-  환경과 검증 습관에서 나왔다.</p>
-
-  <div class="scroll-x"><table>
-    <thead><tr><th style="width:30%">증상</th><th>원인과 교훈</th></tr></thead>
-    <tbody>
-    <tr><td>파일 전송이 시작도 못 하고 죽음</td>
-      <td>운영체제에 기본 탑재된 동기화 도구가 2006년 버전과 호환되는 구현이라, 최신 문서에 나오는 옵션이 아예 없었다. <b>플랫폼 기본 도구의 실제 버전을 확인하고 쓴다.</b></td></tr>
-    <tr><td>모델 변환이 조용히 실패</td>
-      <td>딥러닝 프레임워크의 최신 버전이 변환 도구의 검증 범위를 벗어났다. 경고만 뜨고 진행되다가 변환 단계에서 깨진다. <b>배포 경로의 의존성은 버전을 고정한다.</b></td></tr>
-    <tr><td>환경 구성이 절반만 된 채 종료</td>
-      <td>무거운 선택 의존성 하나가 빌드에 실패했는데, 스크립트가 오류에서 즉시 중단되도록 설정되어 있어 나머지 필수 패키지까지 설치되지 않았다. <b>실패 가능성이 높은 선택 의존성은 분리해서 설치한다.</b></td></tr>
-    <tr><td>문법 검사를 통과한 스크립트가 실행 중 죽음</td>
-      <td>운영체제 기본 셸이 2007년 버전이라, 빈 배열을 다루는 방식이 현대 버전과 달랐다. 문법은 옳고 실행만 실패하는 종류였다. <b>셸 스크립트는 문법 검사가 아니라 실행까지 확인한다.</b></td></tr>
-    <tr><td>동기화가 바뀐 파일을 건너뜀</td>
-      <td>기본 판정이 크기와 수정시각 비교라, 크기가 같고 같은 초에 쓰인 파일의 변경을 놓쳤다. 지표 파일처럼 숫자 몇 개만 바뀌는 경우가 정확히 이 함정이다. <b>동기화 도구의 판정 기준을 알고 쓴다.</b> 체크섬 비교로 바꿨다.</td></tr>
-    <tr><td>실행한 노트북을 회수했더니 결과가 비어 있음</td>
-      <td>편집기에서 노트북을 실행해도 파일에는 저장되지 않는다. 화면에는 결과가 떠 있으니 성공한 줄 알았다. <b>화면에서 본 것과 파일에 남은 것은 다르다.</b> 아래 항목과 같은 종류의 실수가 하루 만에 다시 나왔다.</td></tr>
-    <tr><td>기억 시스템이 결정 여덟 건을 흘림</td>
-      <td>자동 요약을 맡긴 보조 모델이 하루치 의사결정을 "기록할 내용 없음"으로 판정했다. <b>자동화의 출력은 주기적으로 사람이 확인해야 한다.</b> 프롬프트를 구체화하고 더 큰 모델로 바꾸자 열한 줄이 제대로 쌓였다.</td></tr>
-    </tbody>
-  </table></div>
-
-  <div class="insight"><h3>일곱 중 다섯은 같은 원인이었다</h3>
-  <p>기능을 잘못 만든 것이 아니라 <b>확인했다고 믿었지만 실제로는 확인하지 않은 것</b>에서 나왔다.
-  문법 검사는 통과했고, 문서의 옵션은 존재했고, 동기화는 성공했다고 보고했고, 화면에는 결과가
-  떠 있었다. 그런데 파일에는 아무것도 남지 않았거나 조용히 건너뛰었다. 확인의 단위를
-  "작성했다"에서 "돌려보고 결과물을 열어봤다"로 옮기는 것이 이 구간의 교훈이다.
-  그리고 이 교훈은 한 번 배운 뒤에도 하루 만에 다시 틀렸다.</p></div>
-
-  <div class="insight"><h3>통과한 것들</h3>
-  <p>같은 기간에 의도대로 작동한 것도 기록해 둔다. <b>합성 데이터로 학습 하네스를 먼저 검증한 것</b>이
-  가장 값어치를 했다. 실데이터 없이 파이프라인 전체가 도는지, 심어둔 신호를 되찾는지를 미리 확인해
-  두었기 때문에 지금 데이터가 도착하면 바로 학습으로 들어갈 수 있다. <b>회수 경로를 단방향으로
-  설계한 것</b>도 그렇다. 데이터셋을 읽는 경로에서 아예 빼두어, 규칙이 아니라 구조로 막았다.
-  가짜 서버 300MB로 모의해 12KB만 넘어오는 것을 확인했다.</p></div>
-
-  <div class="insight"><h3>환경은 코드보다 먼저 깨진다</h3>
-  <p>모델 설계나 알고리즘에서 막힌 적은 아직 없다. 막힌 것은 전부 버전, 경로, 권한, 셸이었다.
-  준비 구간의 시간이 어디로 가는지를 정직하게 보여주는 기록이라 남긴다.</p></div>
-</section>
-
-<section id="log">
-  <div class="ch">Ch. 08</div>
-  <h2>빌드 로그</h2>
-  <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
-  <div class="timeline">
-    <div class="tl"><div class="d">2026.08.10</div><div><h3>킥오프. 시장을 먼저, 모델은 수단으로</h3>
-      <p>경쟁 리서치로 빈 포지션 확인. 기기 없이 카메라 30초와 월간 추적의 조합은 아무도 하지 않고 있었다.</p></div></div>
-    <div class="tl"><div class="d">2026.08.10</div><div><h3>데이터셋 스키마 복원</h3>
-      <p>발표 영상 프레임 판독으로 비공개 라벨 구조 복원. 14관절, 5등급, 다리별 좌우, 압력센서 정답지.</p></div></div>
-    <div class="tl"><div class="d">2026.08.10</div><div><h3>파이프라인 검증. 심은 신호를 되찾는가</h3>
-      <p>합성 궤적에 파행 신호를 주입하고 복원 실험. 처음엔 실패했고(비현실적 기하) 수정 후 AUC 0.986.</p></div></div>
-    <div class="tl"><div class="d">2026.08.10</div><div><h3>iOS 스캐폴드. 촬영부터 공유 카드까지</h3>
-      <p>Core ML 변환 검증(388KB), 시뮬레이터에서 전체 플로우 확인.</p></div></div>
-    <div class="tl"><div class="d">2026.08.11</div><div><h3>이름 여정 시작, 사이트 오픈</h3>
-      <p>펫 닥터 포켓에서 출발해 후보 3라운드와 Dwag를 거쳤다. 네이밍도 빌드 인 퍼블릭.</p></div></div>
-    <div class="tl"><div class="d">2026.08.14</div><div><h3>이름 확정. Dogtor 독터</h3>
-      <p>브리드별 위험도 리서치, 단계별 파인튜닝 계획, 규제 로드맵(웰니스에서 진단보조 승격)도 확정.</p></div></div>
-    <div class="tl"><div class="d">2026.08.14</div><div><h3>헤르메스 하니스 구축</h3>
-      <p>3층 기억 구조 내재화, 보안 점검(주입 방어, 도구 차단, 파일 권한)까지 완료. 사이트 리디자인.</p></div></div>
-    <div class="tl"><div class="d">2026.08.14</div><div><h3>와이어프레임 확정, 백본 결정</h3>
-      <p>병원 연계 3축을 화면에 내장한 7화면 컨셉. 백본은 후보 6종 정량 비교로 RTMPose-m 본선 확정. 원격 학습 스크립트와 실험 리더보드 체계 구축.</p></div></div>
-    <div class="tl"><div class="d">2026.08.19</div><div><h3>시장의 실제 숫자를 먼저 보다</h3>
-      <p>유사 앱의 공시와 실적을 조사해 기준선을 교체했다. 선두 사업자의 손익과 최유사 서비스의 회원당 매출을 확인한 뒤 수익원 순서를 구독에서 병원 연계로 뒤집었다.</p></div></div>
-    <div class="tl"><div class="d">2026.08.20</div><div><h3>학습 서버 환경 구성</h3>
-      <p>원격 워크스테이션에 코드를 옮기고 실행 환경을 세웠다. 이 과정에서 깨진 일곱 가지를 07장에 정리했다. 양방향 동기화는 쓰지 않고 결과를 한 방향으로만 회수하는 구조로 정리했다.</p></div></div>
-    <div class="tl"><div class="d">2026.08.20</div><div><h3>데이터 이용 승인, 학습 착수</h3>
-      <p>필요한 데이터셋 네 종의 이용 승인을 받았다. 다음은 내려받기와 스키마 검증이며, 그와 병렬로 학습 환경에서의 처리량을 실측해 파인튜닝 소요 시간을 확정한다.</p></div></div>
-    <div class="tl future"><div class="d">NEXT</div><div><h3>실데이터 학습, 평가를 직접 판단</h3>
-      <p>서버 학습 완주 후 민감도와 특이도 게이트 통과 여부를 스스로 판정하는 것이 다음 마일스톤.</p></div></div>
-    <div class="tl future"><div class="d">THEN</div><div><h3>실기기 검증, TestFlight, 출시</h3>
-      <p>실제 강아지로 검증하고 한국 우선 출시. 이후 강아지 질환 확장, 그 다음 고양이.</p></div></div>
+<section>
+  <div class="ch">04</div>
+  <h2>더 깊이 보기</h2>
+  <p class="section-lede">문제를 좁힌 과정, 아키텍처 결정의 근거, 실제로 깨진 것들까지
+  전부 한 문서에 정리했다.</p>
+  <div class="btns">
+    <a class="btn primary" href="pipeline.html">파이프라인 해부 읽기</a>
   </div>
 </section>
 
@@ -574,60 +118,23 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 이상 신호와 무관하게 반려견의 정기 검진을 권장합니다.</p>
 
 <footer>
-  <a href="https://github.com/jsonpassion">@jsonpassion</a>
+  <a href="https://github.com/jsonpassion">github.com/jsonpassion</a>
 </footer>
 
 </div>
+
 <script>
   (function () {
     var btn = document.getElementById("themeToggle");
-    var mq = window.matchMedia("(prefers-color-scheme: dark)");
-    function current() {
-      return document.documentElement.dataset.theme || (mq.matches ? "dark" : "light");
-    }
-    function paint() { btn.textContent = current() === "dark" ? "☀️" : "🌙"; }
+    function cur() { return document.documentElement.dataset.theme || "dark"; }
+    function paint() { btn.textContent = cur() === "dark" ? "☀️" : "🌙"; }
     btn.addEventListener("click", function () {
-      var next = current() === "dark" ? "light" : "dark";
+      var next = cur() === "dark" ? "light" : "dark";
       document.documentElement.dataset.theme = next;
       localStorage.setItem("dogtor-theme", next);
       paint();
     });
-    mq.addEventListener("change", paint);
     paint();
-  })();
-
-  // 스크롤 스파이: 상단 내비와 좌측 목차 모두에 현재 섹션 표시
-  (function () {
-    var links = Array.prototype.slice.call(document.querySelectorAll("#navlinks a, #sidenav a"));
-    var byId = {};
-    links.forEach(function (a) {
-      var id = a.getAttribute("href").slice(1);
-      (byId[id] = byId[id] || []).push(a);
-    });
-    var sections = Object.keys(byId).map(function (id) { return document.getElementById(id); });
-    var activeId = null;
-    function setActive(id) {
-      if (id === activeId) return;
-      activeId = id;
-      links.forEach(function (a) { a.classList.remove("active"); });
-      (byId[id] || []).forEach(function (a) {
-        a.classList.add("active");
-        if (a.closest("#navlinks")) {
-          a.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
-        }
-      });
-    }
-    function update() {
-      var nav = document.getElementById("topnav").offsetHeight;
-      var cur = null;
-      for (var i = 0; i < sections.length; i++) {
-        if (sections[i].getBoundingClientRect().top <= nav + 90) cur = sections[i].id;
-      }
-      setActive(cur);
-    }
-    var observer = new IntersectionObserver(update, { rootMargin: "-10% 0px -60% 0px", threshold: [0, 0.1, 0.5, 1] });
-    sections.forEach(function (s) { observer.observe(s); });
-    window.addEventListener("scroll", update, { passive: true });
   })();
 </script>
 </body>
