@@ -53,10 +53,11 @@
   <a href="#measure"><span class="n">05</span>학습 환경 실측</a>
   <a href="#gates"><span class="n">06</span>무엇으로 결정하는가</a>
   <a href="#data"><span class="n">07</span>데이터와 스키마</a>
-  <a href="#memory"><span class="n">08</span>기억 하니스</a>
-  <a href="#stuck"><span class="n">09</span>막힌 지점들</a>
-  <a href="#insight"><span class="n">10</span>인사이트</a>
-  <a href="#log"><span class="n">11</span>빌드 로그</a>
+  <a href="#schema"><span class="n">08</span>가정이 틀린 지점</a>
+  <a href="#memory"><span class="n">09</span>기억 하니스</a>
+  <a href="#stuck"><span class="n">10</span>막힌 지점들</a>
+  <a href="#insight"><span class="n">11</span>인사이트</a>
+  <a href="#log"><span class="n">12</span>빌드 로그</a>
 </aside>
 
 <div class="wrap">
@@ -443,8 +444,103 @@ flowchart TD
   무관하므로 견종 의존을 원천적으로 줄인다. 견종별 데이터를 모으지 않고 얻는 개선이다.</p>
 </section>
 
-<section id="memory">
+<section id="schema">
   <div class="ch">08</div>
+  <h2>가정이 틀린 지점</h2>
+  <p class="section-lede">라벨 10만 건을 전수 파싱해 미리 세워둔 가정 다섯 개를 검증했다.
+  셋이 틀렸고, 그중 둘은 그대로 뒀다면 학습 전체가 무의미해질 것이었다.</p>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th style="width:26%">가정</th><th style="width:12%">결과</th><th>내용</th></tr></thead>
+    <tbody>
+    <tr><td>파일명 규칙</td><td class="st ok">맞음</td><td>병원과 촬영 일시와 프레임 번호 구조가 예상대로였다</td></tr>
+    <tr><td>세션 내 등급 일관성</td><td class="st ok">맞음</td><td>907개 세션 중 1건만 불일치. 0.1퍼센트라 무시 가능</td></tr>
+    <tr><td>다리별 좌우 등급</td><td class="st ok">맞음</td><td>좌우가 서로 다른 사례가 다수. 다리별 신호 기능의 근거가 확인되었다</td></tr>
+    <tr><td><b>관절 라벨</b></td><td class="st wip">틀림</td><td>14개 한글명을 가정했으나 <b>12개 영문 해부학명</b>이었다. 발끝이 좌우 2점이라는 추정도 틀렸다</td></tr>
+    <tr><td><b>좌표 형식</b></td><td class="st wip">틀림</td><td>픽셀로 가정했으나 <b>이미 0에서 1로 정규화된 문자열</b>이었다</td></tr>
+    <tr><td><b>세션 단위</b></td><td class="st wip">틀림</td><td>경로에 촬영 방향이 있는데 키에서 빠져 <b>4개 시퀀스가 하나로 뭉쳤다</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout"><b>왜 이 검증이 필요했는가.</b> 좌표를 픽셀로 가정한 코드가 그대로
+  돌았다면 이미 정규화된 값을 한 번 더 나눠 모든 좌표가 0 근처로 뭉갰을 것이다.
+  오류도 나지 않고 학습도 돌아간다. 다만 아무것도 배우지 못한다.
+  방향이 빠진 세션 키도 마찬가지로, 서로 다른 각도의 프레임이 한 궤적에 섞여
+  시간 순서가 무의미해진다. <b>둘 다 조용히 실패하는 종류다.</b></div>
+
+  <h3>맞은 것도 있었다</h3>
+  <p>등급 분포는 공표치와 0.5퍼센트포인트 이내로 일치했다. 정상 55.7퍼센트,
+  1기 9.6, 2기 14.4, 3기 17.5, 4기 2.8이다. 라벨의 의미 자체는 바르게 읽고 있었다는 뜻이다.
+  개체 단위 분할도 의도대로 동작해 학습과 평가에 같은 개가 겹치지 않는다.</p>
+
+  <h3>데이터가 시장과 겹친다</h3>
+  <p>견종 분포 상위가 푸들, 말티즈, 비숑, 치와와, 포메라니안이다. 이 프로젝트가
+  타깃으로 삼은 한국 소형견 구성과 정확히 겹친다. 시장을 보고 문제를 좁힌 판단이
+  데이터에서도 확인된 셈이다. 다만 같은 견종이 다른 이름으로 들어 있어 정규화가 필요했다.</p>
+
+  <figure class="viz">
+  <svg viewBox="0 0 600 260" role="img" aria-label="12개 관절과 보행 주기 애니메이션">
+    <defs>
+      <style>
+        @keyframes swingA { 0%,100% { transform: rotate(16deg); } 50% { transform: rotate(-16deg); } }
+        @keyframes swingB { 0%,100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+        @keyframes swingWeak { 0%,100% { transform: rotate(6deg); } 50% { transform: rotate(-6deg); } }
+        .lf { animation: swingA 1.5s ease-in-out infinite; transform-origin: 214px 150px; }
+        .lb { animation: swingB 1.5s ease-in-out infinite; transform-origin: 386px 150px; }
+        .lbad { animation: swingWeak 1.5s ease-in-out infinite; transform-origin: 396px 150px; }
+      </style>
+    </defs>
+
+    <!-- 몸통 축 -->
+    <path class="dog-body" d="M170 118 L214 128 L300 132 L386 128 L424 120"/>
+    <path class="dog-body" d="M170 118 L158 104"/>
+
+    <!-- 앞다리 -->
+    <g class="lf">
+      <path class="dog-leg" d="M214 128 L210 150 L216 176 L212 200"/>
+    </g>
+    <!-- 뒷다리 정상 -->
+    <g class="lb">
+      <path class="dog-leg" d="M386 128 L392 150 L384 176 L390 200"/>
+    </g>
+    <!-- 뒷다리 이상 신호 -->
+    <g class="lbad">
+      <path class="dog-leg bad" d="M396 130 L404 152 L398 178 L404 200"/>
+    </g>
+
+    <!-- 12 관절 -->
+    <g>
+      <circle class="kp" cx="158" cy="104" r="4"/><text class="kp-label" x="130" y="96">1 Ear</text>
+      <circle class="kp" cx="300" cy="132" r="4"/><text class="kp-label" x="284" y="124">2 T13</text>
+      <circle class="kp" cx="214" cy="128" r="4"/><text class="kp-label" x="186" y="120">3 견갑</text>
+      <circle class="kp" cx="212" cy="140" r="4"/><text class="kp-label" x="150" y="144">4 견봉</text>
+      <circle class="kp" cx="210" cy="158" r="4"/><text class="kp-label" x="140" y="162">5 주관절</text>
+      <circle class="kp" cx="215" cy="180" r="4"/><text class="kp-label" x="140" y="184">6 완관절</text>
+      <circle class="kp" cx="212" cy="200" r="4"/><text class="kp-label" x="140" y="206">7 앞발끝</text>
+      <circle class="kp" cx="386" cy="128" r="4"/><text class="kp-label" x="398" y="118">8 장골능선</text>
+      <circle class="kp" cx="390" cy="142" r="4"/><text class="kp-label" x="432" y="146">9 대전자</text>
+      <circle class="kp bad" cx="392" cy="160" r="4.5"/><text class="kp-label" x="432" y="164">10 무릎</text>
+      <circle class="kp" cx="386" cy="178" r="4"/><text class="kp-label" x="432" y="182">11 비절</text>
+      <circle class="kp" cx="390" cy="200" r="4"/><text class="kp-label" x="432" y="206">12 뒷발끝</text>
+    </g>
+
+    <!-- 궤적 -->
+    <path class="trace" d="M212 214 q10 -10 20 0 q10 10 20 0 q10 -10 20 0"/>
+    <path class="trace bad" d="M392 214 q10 -5 20 0 q10 5 20 0 q10 -5 20 0"/>
+    <text class="kp-label" x="212" y="236">앞발 궤적</text>
+    <text class="kp-label" x="392" y="236">뒷발 궤적, 진폭 감소</text>
+  </svg>
+  <div class="legend">
+    <span><i style="background:var(--accent)"></i>정상 관절</span>
+    <span><i style="background:var(--wip)"></i>이상 신호가 나타나는 지점</span>
+  </div>
+  <figcaption>그림 7. 데이터가 라벨링하는 12개 골성 랜드마크와, 파행이 궤적에 남기는 흔적.</figcaption>
+  </figure>
+
+</section>
+
+<section id="memory">
+  <div class="ch">09</div>
   <h2>기억 하니스</h2>
   <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정과 스펙과 절차를
   자동으로 축적하는 로컬 시스템을 만들었다.</p>
@@ -490,7 +586,7 @@ flowchart TD
 </section>
 
 <section id="stuck">
-  <div class="ch">09</div>
+  <div class="ch">10</div>
   <h2>막힌 지점들</h2>
   <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 알고리즘이 아니라
   환경과 검증 습관에서 나왔다.</p>
@@ -512,13 +608,17 @@ flowchart TD
       <td>편집기에서 노트북을 실행해도 파일에는 저장되지 않는다. 화면에 결과가 떠 있으니 성공한 줄 알았다. <b>화면에서 본 것과 파일에 남은 것은 다르다.</b></td></tr>
     <tr><td>기억 시스템이 결정 여덟 건을 흘림</td>
       <td>자동 요약을 맡긴 보조 모델이 하루치 의사결정을 기록할 내용 없음으로 판정했다. <b>자동화의 출력은 주기적으로 사람이 확인해야 한다.</b> 프롬프트를 구체화하고 더 큰 모델로 바꾸자 제대로 쌓였다.</td></tr>
+    <tr><td>44GB 아카이브가 크기는 맞는데 열리지 않음</td>
+      <td>공식 다운로더가 분할 조각을 문자열 순으로 이어 붙인다. 조각 이름이 바이트 오프셋이라 자릿수가 늘어나는 순간 순서가 뒤집힌다. 10GB 미만 파일에서는 드러나지 않아 작은 것 셋은 무사했다. <b>크기가 맞다고 내용이 맞는 것은 아니다.</b></td></tr>
+    <tr><td>검증 기준을 두 번 연속 잘못 잡음</td>
+      <td>압축 파일의 항목 수를 세는 데 디렉토리까지 포함해 비율을 왜곡했고, 그 잘못된 숫자로 정상인 데이터를 손상으로 오판했다. 반대로 다른 하나는 통과시켜 원본을 지워버렸다. <b>검증 로직 자체가 검증되지 않으면 검증이 아니다.</b></td></tr>
     <tr><td>여러 줄을 붙여넣자 비밀값이 오염됨</td>
       <td>비밀번호 입력을 기다리는 명령이 다음 줄의 명령어를 값으로 삼켰다. 그 결과 실행되어야 할 명령이 사라졌다. <b>입력을 기다리는 명령은 한 줄씩 실행한다.</b></td></tr>
     </tbody>
   </table></div>
 
   <div class="panel">
-    <h3>여덟 중 여섯은 같은 원인이었다</h3>
+    <h3>열 중 일곱은 같은 원인이었다</h3>
     <p>기능을 잘못 만든 것이 아니라 <b>확인했다고 믿었지만 실제로는 확인하지 않은 것</b>에서
     나왔다. 문법 검사는 통과했고, 문서의 옵션은 존재했고, 동기화는 성공했다고 보고했고,
     화면에는 결과가 떠 있었다. 그런데 파일에는 아무것도 남지 않았거나 조용히 건너뛰었다.
@@ -542,7 +642,7 @@ flowchart TD
 </section>
 
 <section id="insight">
-  <div class="ch">10</div>
+  <div class="ch">11</div>
   <h2>인사이트</h2>
   <p class="section-lede">2026년 8월, 첫 준비 구간에서 배운 것들.</p>
 
@@ -571,6 +671,13 @@ flowchart TD
   도착하면 바로 학습으로 들어갈 수 있다. <b>데이터를 기다리는 시간에 파이프라인을
   검증해 두는 것</b>이 준비 구간의 핵심이었다.</p></div>
 
+  <div class="panel"><h3>조용히 실패하는 것이 가장 위험하다</h3>
+  <p>라벨 검증에서 가정 셋이 틀렸는데, 둘은 <b>오류 없이 학습이 돌아가되 아무것도
+  배우지 못하는</b> 종류였다. 이미 정규화된 좌표를 한 번 더 나누면 모든 값이 0 근처로
+  뭉개지지만 예외는 나지 않는다. 서로 다른 촬영 각도가 한 궤적에 섞여도 코드는 멈추지 않는다.
+  <b>데이터를 만지기 전에 가정을 글로 적어두고 전수로 확인하는 절차</b>가 이 종류를
+  잡아내는 유일한 방법이었다.</p></div>
+
   <div class="panel"><h3>AI 협업의 경계선 두 줄</h3>
   <p>이 프로젝트는 AI와 페어로 만든다. 지키는 원칙은 두 줄이다. <b>숫자를 만드는 일은
   맡겨도 숫자를 읽고 결정하는 일은 내 몫이다. 화면을 만드는 일은 맡겨도 화면이 하는 말을
@@ -578,7 +685,7 @@ flowchart TD
 </section>
 
 <section id="log">
-  <div class="ch">11</div>
+  <div class="ch">12</div>
   <h2>빌드 로그</h2>
   <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
   <div class="timeline">
@@ -606,6 +713,8 @@ flowchart TD
       <p>공개 데이터로 학습 가능성을 확인했다. 처리량 18 img/s, 커스텀 키포인트 헤드 학습 확인. 다만 하드웨어 활용률이 4.6퍼센트로 나와 병목이 연산이 아님을 발견했고, 학습 스케줄 확정을 다음 측정 뒤로 미뤘다.</p></div></div>
     <div class="tl"><div class="d">2026.08.20</div><div><h3>견종 대응 방침 결정</h3>
       <p>견종별 모델 분리는 하지 않는다. 계층별 약점 파악과 각도 기반 특징으로 대응하고, 견종별 해석은 수의사에게 보여줄 참고 자료로 넘긴다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.20</div><div><h3>데이터 확보와 스키마 검증</h3>
+      <p>50GB를 내려받아 라벨 10만 건을 전수 검증했다. 미리 세운 가정 다섯 중 셋이 틀렸고 변환 코드를 실데이터에 맞게 고쳤다. 다운로더의 분할 병합 버그로 44GB 아카이브가 깨져 재다운로드 중이다.</p></div></div>
     <div class="tl future"><div class="d">NEXT</div><div><h3>실데이터 학습, 평가를 직접 판단</h3>
       <p>학습 완주 후 민감도와 특이도 게이트 통과 여부를 스스로 판정하는 것이 다음 마일스톤이다.</p></div></div>
     <div class="tl future"><div class="d">THEN</div><div><h3>실기기 검증과 출시</h3>
