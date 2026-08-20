@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파이프라인 해부 — Dogtor 독터</title>
+<meta name="description" content="문제를 좁힌 과정, 아키텍처 결정의 근거, 실제로 깨진 것들. Dogtor를 만드는 전 과정의 기록.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var t = localStorage.getItem("dogtor-theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  })();
+</script>
+</head>
+<body>
+
+<div id="topbar"><div class="tb">
+  <a class="brand" href="index.html">Dogtor</a>
+  <span class="spacer"></span>
+  <a class="nav" href="index.html">개요</a>
+  <a class="nav on" href="pipeline.html">파이프라인 해부</a>
+  <button id="themeToggle" aria-label="다크 라이트 전환" title="다크 라이트 전환">🌙</button>
+</div></div>
+
+<aside id="toc" aria-label="목차">
+  <a href="#frame"><span class="n">01</span>문제를 좁힌 과정</a>
+  <a href="#market"><span class="n">02</span>시장의 실제 숫자</a>
+  <a href="#arch"><span class="n">03</span>파이프라인 구조</a>
+  <a href="#backbone"><span class="n">04</span>백본과 규모 판단</a>
+  <a href="#data"><span class="n">05</span>데이터와 스키마</a>
+  <a href="#memory"><span class="n">06</span>기억 하니스</a>
+  <a href="#stuck"><span class="n">07</span>막힌 지점들</a>
+  <a href="#insight"><span class="n">08</span>인사이트</a>
+  <a href="#log"><span class="n">09</span>빌드 로그</a>
+</aside>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="kicker">파이프라인 해부</span>
+  <h1>무엇을 어떻게<br>결정했는가</h1>
+  <p class="lede">문제를 좁힌 과정, 아키텍처 결정의 근거, 그리고 실제로 깨진 것들.
+  성공한 부분보다 <b>왜 그렇게 정했는지</b>와 <b>어디서 틀렸는지</b>에 무게를 두고 적는다.</p>
+</header>
+
+<section id="frame">
+  <div class="ch">01</div>
+  <h2>문제를 좁힌 과정</h2>
+  <p class="section-lede">막연한 펫 헬스케어에서 출발해 네 단계로 좁혔다.</p>
+  <div class="scroll-x"><table>
+    <tbody>
+    <tr><th style="width:150px">Big Idea</th><td>반려동물은 아픔을 말하지 못한다. 보호자의 알아차림이 건강 수명을 결정한다.</td></tr>
+    <tr><th>Essential Question</th><td>말하지 못하는 반려견의 건강 이상을, 보호자는 어떻게 <b>너무 늦기 전에</b> 알아차릴 수 있는가.</td></tr>
+    <tr><th>Challenge</th><td>장비나 전문 지식 없이, 일상 속에서 이상 신호를 조기에 발견하도록 돕는다.</td></tr>
+    <tr><th>Refined</th><td><b>스마트폰으로 30초 걸음걸이를 찍는 것만으로</b> 소형견 보호자가 슬개골과 관절의 신호를 발견하고 <b>매달 변화를 추적</b>하게 한다.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>좁힌 근거</h3>
+  <div class="scroll-x"><table>
+    <thead><tr><th>좁힌 것</th><th>근거</th></tr></thead>
+    <tbody>
+    <tr><td>이상 신호 전반에서 슬개골과 관절로</td><td>펫보험 지급액 1위 질환이고 소형견 유병 추정이 20에서 25퍼센트다. 보호자가 이미 걱정하고 있어 교육 비용이 없다.</td></tr>
+    <tr><td>모든 반려견에서 소형견 우선으로</td><td>한국에서 많이 기르는 견종 상위권이 곧 고위험군이다. 타깃과 시장이 일치한다.</td></tr>
+    <tr><td>일상 속 수단에서 30초 보행 영상으로</td><td>경쟁이 비어 있고 학습에 쓸 공개 데이터가 존재한다.</td></tr>
+    <tr><td>조기 발견에 월간 추적을 더함</td><td>수술을 권하기 전 관찰 구간이 길다. 보호자가 가장 오래 불안해하는 시간이 곧 제품이 필요한 시간이다.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="market">
+  <div class="ch">02</div>
+  <h2>시장의 실제 숫자</h2>
+  <p class="section-lede">시장 보고서의 조 단위 전망 대신, 같은 일을 하는 회사들이
+  실제로 벌어들인 돈을 기준선으로 삼았다.</p>
+
+  <div class="stats">
+    <div class="stat"><span class="num">-78.5억</span>
+      <span class="lbl">국내 선두 앱의 2024년 영업손실. 같은 해 매출은 36.4억 원이었다</span></div>
+    <div class="stat"><span class="num">1,400원</span>
+      <span class="lbl">가장 유사한 서비스의 회원 1인당 연매출 추정치</span></div>
+    <div class="stat"><span class="num">492달러</span>
+      <span class="lbl">구독 앱 월매출 중앙값. 상위 10퍼센트가 전체의 94.5퍼센트를 가져간다</span></div>
+    <div class="stat"><span class="num">0</span>
+      <span class="lbl">하드웨어 없는 순수 AI 스크리닝으로 미국에서 성공한 사례</span></div>
+  </div>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th>사례</th><th>공개된 실적</th></tr></thead>
+    <tbody>
+    <tr><td>국내 선두 앱</td><td>2024년 매출 36.4억 원에 영업손실 78.5억 원. 2025년 매출은 18.1억 원으로 반토막. 5년간 누적 손실 200억 원 이상</td></tr>
+    <tr><td>최유사 서비스</td><td>회원 8만 명, 2024년 매출 1.11억 원. 슬개골 AI 분석이라는 점에서 가장 가깝다</td></tr>
+    <tr><td>커머스 결합형</td><td>2023년 매출 239억 원에서 2024년 163억 원으로 역성장. 헬스케어를 앞세웠으나 매출은 커머스에서 나온다</td></tr>
+    <tr><td>해외 웨어러블</td><td>대형 펫 기업이 1.17억 달러에 인수했으나 2025년 8월 서비스를 완전히 종료했다</td></tr>
+    <tr><td>해외 성공 사례</td><td>구독자 130만 명에 연 반복매출 1억 유로. 핵심 가치는 건강 모니터링이 아니라 분실 방지였다</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="panel">
+    <h3>그래서 순서를 뒤집었다</h3>
+    <p>구독을 첫 수익원으로 잡지 않는다. 무료 스크리닝으로 신뢰와 데이터를 쌓고,
+    이상 소견을 병원 방문으로 잇는 구조를 만들고, 그다음에 보험사와의 공동 설계로 간다.
+    국내 반려동물병원의 71.8퍼센트가 1인 병원이므로 고가 소프트웨어를 파는 접근은
+    성립하지 않는다. 구독은 존재해야 하는 수익원이지 계획을 지탱하는 수익원이 아니다.</p>
+  </div>
+</section>
+
+<section id="arch">
+  <div class="ch">03</div>
+  <h2>파이프라인 구조</h2>
+  <p class="section-lede">포즈 추정(공간)과 경량 시계열(시간)을 분리했다. 전부 기기 안에서 실행된다.</p>
+
+  <figure class="sketch">
+  <svg viewBox="0 0 760 300" role="img" aria-label="온디바이스 파이프라인 다이어그램">
+    <defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M1,1 L8,4.5 L1,8" fill="none" stroke="var(--sketch)" stroke-width="1.4"/></marker></defs>
+    <rect x="8" y="14" width="744" height="210" rx="12" class="sk-hi"/>
+    <text x="26" y="40" class="sk-a">ON-DEVICE. 영상은 기기 밖으로 나가지 않는다</text>
+
+    <g transform="translate(26,62)">
+      <rect width="126" height="76" rx="8" class="sk-box"/>
+      <text x="14" y="30" class="sk-t">30초 촬영</text>
+      <text x="14" y="50" class="sk-s">측면, 빠른 걸음</text>
+      <text x="14" y="65" class="sk-s">가이드 오버레이</text>
+    </g>
+    <line x1="156" y1="100" x2="196" y2="100" class="sk-arrow"/>
+
+    <g transform="translate(200,62)">
+      <rect width="140" height="76" rx="8" class="sk-soft"/>
+      <text x="14" y="30" class="sk-t">포즈 추출</text>
+      <text x="14" y="50" class="sk-s">OS 내장 25관절</text>
+      <text x="14" y="65" class="sk-s">15fps 샘플링</text>
+    </g>
+    <line x1="344" y1="100" x2="384" y2="100" class="sk-arrow"/>
+
+    <g transform="translate(388,62)">
+      <rect width="140" height="76" rx="8" class="sk-soft"/>
+      <text x="14" y="30" class="sk-t">궤적 정규화</text>
+      <text x="14" y="50" class="sk-s">몸통 중심, 크기 불변</text>
+      <text x="14" y="65" class="sk-s">14관절 150프레임</text>
+    </g>
+    <line x1="532" y1="100" x2="572" y2="100" class="sk-arrow"/>
+
+    <g transform="translate(576,62)">
+      <rect width="150" height="76" rx="8" class="sk-box"/>
+      <text x="14" y="30" class="sk-t">시계열 분류기</text>
+      <text x="14" y="50" class="sk-s">185K 파라미터, 388KB</text>
+      <text x="14" y="65" class="sk-s">뉴럴 엔진</text>
+    </g>
+
+    <line x1="651" y1="142" x2="651" y2="168" class="sk-arrow"/>
+    <g transform="translate(420,172)">
+      <rect width="306" height="44" rx="8" class="sk-soft"/>
+      <text x="14" y="20" class="sk-t">결과 3단계</text>
+      <text x="14" y="36" class="sk-s">정상 범위, 관찰 필요, 상담 권장. 수의사 상담 프레임 유지</text>
+    </g>
+    <line x1="416" y1="194" x2="376" y2="194" class="sk-arrow" transform="rotate(180 396 194)"/>
+    <g transform="translate(66,172)">
+      <rect width="300" height="44" rx="8" class="sk-soft"/>
+      <text x="14" y="20" class="sk-t">공유 카드와 월간 추적</text>
+      <text x="14" y="36" class="sk-s">공유는 무료 무제한. 바이럴 루프의 자산</text>
+    </g>
+
+    <text x="26" y="262" class="sk-s">학습은 원격 워크스테이션에서. 추론과 동일한 궤적 경로로 학습해 분포를 일치시킨다</text>
+    <text x="26" y="282" class="sk-s">v2 계획: 자체 포즈 모델 풀 파인튜닝. 장모 소형견 특화가 해자</text>
+  </svg>
+  <figcaption>그림 1. 점선 안이 전부 기기 위에서 실행된다.</figcaption>
+  </figure>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th style="width:33%">선택</th><th>이유</th></tr></thead>
+    <tbody>
+    <tr><td>포즈와 시계열 분리<br>(비디오 분류 기각)</td><td>관절 좌표가 외형과 배경을 지워 촬영 환경 변화에 강하고, 2천여 영상으로도 학습이 성립한다. 좌우 대칭 같은 해석 가능한 지표가 그대로 제품 언어가 되는 것도 이유다.</td></tr>
+    <tr><td>OS 내장 포즈로 시작</td><td>무료이고 즉시 쓸 수 있다. 해자는 포즈 자체가 아니라 그 위의 파행 분류와 종단 데이터에 있다.</td></tr>
+    <tr><td>특이도 우선 임계값</td><td>스크리닝의 최대 리스크는 위양성이다. 병원에 갔는데 정상이라는 경험이 반복되면 신뢰가 무너진다.</td></tr>
+    <tr><td>개체 단위 데이터 분할</td><td>같은 개의 영상이 학습과 평가에 걸치면 성능이 부풀려진다. 프레임 단위 분할을 금지했다.</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>학습은 통합메모리 192GiB에 24코어인 Apple Silicon 워크스테이션에서 원격으로 수행한다.
+  메모리가 넉넉해 배치 크기에 제약이 없고, 온디바이스에 올릴 수 없는 큰 모델을 교사로 세워
+  정확도의 상한을 재는 실험까지 가능하다.</p>
+</section>
+
+<section id="backbone">
+  <div class="ch">04</div>
+  <h2>백본과 규모 판단</h2>
+  <p class="section-lede">컴퓨팅이 넉넉하니 큰 모델을 쓰면 되는가. 답은 그렇게 단순하지 않았다.</p>
+
+  <p>먼저 질문을 둘로 나눠야 했다. <b>학습 규모와 배포 규모는 서로 다른 제약을 받는다.</b>
+  192GiB는 학습 장비의 사양이고, 제품이 도는 곳은 아이폰의 뉴럴 엔진이다.</p>
+
+  <h3>축 1. 크기를 키우면 정확도가 오르는가</h3>
+  <p>동물 포즈 벤치마크에서 실제로 공개된 가중치만 모아 비교했다.</p>
+  <div class="scroll-x"><table>
+    <thead><tr><th>계열</th><th>파라미터</th><th>동물 벤치마크</th><th>기준 대비</th></tr></thead>
+    <tbody>
+    <tr><td>경량 CNN (배포 후보)</td><td>13.6M</td><td>0.722</td><td>기준</td></tr>
+    <tr><td>중형 CNN</td><td>28.5M</td><td>0.722</td><td>+0.000</td></tr>
+    <tr><td>대형 CNN</td><td>63.6M</td><td>0.728</td><td>+0.006</td></tr>
+    <tr><td>ViT 계열 중형</td><td>86M</td><td>0.745</td><td>+0.023</td></tr>
+    <tr><td>ViT 계열 대형</td><td>307M</td><td><b>0.804</b></td><td><b>+0.082</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">이 표가 말하는 것은 크게 하면 좋아진다가 아니다. <b>CNN 계열은 이미 포화했다.</b>
+  대형 CNN은 4.7배 파라미터를 쓰고도 0.6포인트에 그친다. 반면 ViT 계열은 8.2포인트로 도약한다.
+  이득의 출처는 크기가 아니라 아키텍처와 사전학습 방식이라는 다른 축이다.</div>
+
+  <h3>축 2. 배포 제약은 연산량이 아니다</h3>
+  <p>이 앱은 실시간 카메라가 아니라 녹화된 30초 영상을 사후 처리한다. 프레임당 지연의
+  여유가 커서 큰 모델도 배치 처리로는 수 초면 끝난다. 진짜 병목은 <b>앱 용량과 뉴럴 엔진
+  호환성</b>이다. ViT 대형은 절반 정밀도로도 614MB라 온디바이스에 부적합하다.</p>
+
+  <h3>축 3. 포즈 정확도가 우리 지표를 움직이는가</h3>
+  <p>가장 중요한 미지수다. 최종 지표는 관절 정확도가 아니라 <b>파행 스크리닝의 민감도와
+  특이도</b>다. 관절 정확도가 8포인트 오른다고 판정 성능이 얼마나 오르는지는 아무도 모른다.
+  게다가 파행 등급 라벨 자체의 관찰자 간 일치도가 낮다는 것이 문헌의 지적이다.
+  용량 한계가 아니라 라벨 한계일 가능성이 있다.</p>
+
+  <div class="panel">
+    <h3>결론</h3>
+    <p><b>배포 모델은 유지하고 학습 쪽만 확대한다.</b> 교사 모델을 대형 ViT로 올려
+    정확도의 상한을 재고, 그 격차가 다운스트림 지표를 얼마나 움직이는지 측정한 뒤에
+    배포 모델 교체를 판단한다. 판정 기준은 코드에 박아두었다. 지표 차이가 0.02 미만이면
+    현재 계획을 유지하고, 0.05 이상이면 배포 모델 교체를 과제로 승격한다.</p>
+  </div>
+
+  <p>시계열 분류기는 키우지 않는다. 영상 2천여 건에 개체 약 1천 마리 규모에서는
+  185K 파라미터도 과할 수 있고, 용량을 늘리면 과적합이 먼저 온다.</p>
+</section>
+
+<section id="data">
+  <div class="ch">05</div>
+  <h2>데이터와 스키마</h2>
+  <p class="section-lede">공개 페이지에 없는 라벨 구조를 복원하는 것이 첫 관문이었다.</p>
+
+  <p>학습 데이터는 중소형견 1천 마리 이상을 전후좌우 네 방향에서 촬영한 보행 영상 2,094건과
+  12만여 장의 관절 라벨 프레임이다. 그런데 <b>라벨의 실제 구조가 공개 페이지에 없었다.</b>
+  구축기관의 발표 영상을 프레임 단위로 판독해 14개 해부학 랜드마크의 정확한 부위명,
+  다리별 좌우 등급 구조, 압력센서 컬럼 구성을 복원했다.</p>
+
+  <p>이 복원이 곧 기능 기획이 되었다. 다리별 등급이 라벨에 있다는 사실을 알았기 때문에
+  <b>왼쪽 뒷다리 쪽 신호</b>라는 제품 기능이 가능해졌다. 리서치가 곧 기획이었던 셈이다.</p>
+
+  <h3>아직 검증되지 않은 가정</h3>
+  <p>복원본은 어디까지나 추론이다. 실데이터가 도착하면 다섯 가지 가정을 확인해야 하며,
+  특히 관절 라벨의 실제 문자열이 가정과 다르면 변환 코드를 고쳐야 한다.
+  검증 노트북이 불일치를 감지하면 교체하라고 출력하도록 만들어 두었다.</p>
+
+  <div class="callout">한 가지 중요한 도메인 갭이 있다. 학습 데이터는 트레드밀 위에서
+  하네스를 착용하고 촬영되었고, 실제 사용자는 거실이나 산책로에서 찍는다.
+  관절 좌표만 쓰는 설계가 이 갭을 줄이는 이유이기도 하다.</div>
+</section>
+
+<section id="memory">
+  <div class="ch">06</div>
+  <h2>기억 하니스</h2>
+  <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정과 스펙과 절차를
+  자동으로 축적하는 로컬 시스템을 만들었다.</p>
+
+  <figure class="sketch">
+  <svg viewBox="0 0 760 268" role="img" aria-label="기억 하니스 3층 구조">
+    <g transform="translate(24,20)"><rect width="150" height="64" rx="8" class="sk-box"/>
+      <text x="14" y="26" class="sk-t">페르소나</text><text x="14" y="46" class="sk-s">불변 규칙</text></g>
+    <g transform="translate(24,102)"><rect width="150" height="64" rx="8" class="sk-soft"/>
+      <text x="14" y="26" class="sk-t">절차 기억</text><text x="14" y="46" class="sk-s">키워드 매칭</text></g>
+    <g transform="translate(24,184)"><rect width="150" height="64" rx="8" class="sk-soft"/>
+      <text x="14" y="26" class="sk-t">에피소드 기억</text><text x="14" y="46" class="sk-s">전문 검색 인덱스</text></g>
+
+    <line x1="178" y1="52" x2="288" y2="112" class="sk-arrow"/>
+    <line x1="178" y1="134" x2="288" y2="128" class="sk-arrow"/>
+    <line x1="178" y1="216" x2="288" y2="146" class="sk-arrow"/>
+
+    <g transform="translate(292,96)"><rect width="170" height="70" rx="8" class="sk-box"/>
+      <text x="14" y="28" class="sk-t">컨텍스트 조립</text>
+      <text x="14" y="48" class="sk-s">임베딩 없이 키워드로</text>
+      <text x="14" y="62" class="sk-s">작업 세션에 첨부</text></g>
+
+    <line x1="466" y1="131" x2="546" y2="131" class="sk-arrow"/>
+    <g transform="translate(550,96)"><rect width="186" height="70" rx="8" class="sk-soft"/>
+      <text x="14" y="28" class="sk-t">사실 증류</text>
+      <text x="14" y="48" class="sk-s">이벤트가 쌓였을 때만</text>
+      <text x="14" y="62" class="sk-s">비용이 통제된다</text></g>
+
+    <path d="M 640 170 C 640 210, 420 236, 240 220" class="sk-arrow"/>
+    <g transform="translate(292,196)"><rect width="170" height="52" rx="8" class="sk-box"/>
+      <text x="14" y="22" class="sk-t">의미 기억</text><text x="14" y="40" class="sk-s">내구 사실만 남긴다</text></g>
+    <text x="556" y="206" class="sk-a">잡담은 버린다</text>
+
+    <text x="550" y="40" class="sk-a">보안 설계</text>
+    <text x="550" y="58" class="sk-s">증류 모델의 도구 사용 전면 차단</text>
+    <text x="550" y="74" class="sk-s">API 키 없이 동작</text>
+  </svg>
+  <figcaption>그림 2. 표준 라이브러리만으로 만든 3층 기억 구조.</figcaption>
+  </figure>
+
+  <p>외부 의존성과 API 키가 없어 어디서든 실행되고, 증류는 이벤트가 쌓였을 때만 일어나
+  비용이 통제된다. 다만 이 시스템도 한 번 조용히 실패했다. 아래에 적는다.</p>
+</section>
+
+<section id="stuck">
+  <div class="ch">07</div>
+  <h2>막힌 지점들</h2>
+  <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 알고리즘이 아니라
+  환경과 검증 습관에서 나왔다.</p>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th style="width:30%">증상</th><th>원인과 교훈</th></tr></thead>
+    <tbody>
+    <tr><td>파일 전송이 시작도 못 하고 죽음</td>
+      <td>운영체제에 기본 탑재된 동기화 도구가 2006년 버전과 호환되는 구현이라, 최신 문서에 나오는 옵션이 아예 없었다. <b>플랫폼 기본 도구의 실제 버전을 확인하고 쓴다.</b></td></tr>
+    <tr><td>모델 변환이 조용히 실패</td>
+      <td>딥러닝 프레임워크의 최신 버전이 변환 도구의 검증 범위를 벗어났다. 경고만 뜨고 진행되다가 변환 단계에서 깨진다. <b>배포 경로의 의존성은 버전을 고정한다.</b></td></tr>
+    <tr><td>환경 구성이 절반만 된 채 종료</td>
+      <td>무거운 선택 의존성 하나가 빌드에 실패했는데, 스크립트가 오류에서 즉시 중단되도록 설정되어 있어 나머지 필수 패키지까지 설치되지 않았다. <b>실패 가능성이 높은 선택 의존성은 분리해서 설치한다.</b></td></tr>
+    <tr><td>문법 검사를 통과한 스크립트가 실행 중 죽음</td>
+      <td>운영체제 기본 셸이 2007년 버전이라 빈 배열을 다루는 방식이 현대 버전과 달랐다. 문법은 옳고 실행만 실패하는 종류였다. <b>셸 스크립트는 문법 검사가 아니라 실행까지 확인한다.</b></td></tr>
+    <tr><td>동기화가 바뀐 파일을 건너뜀</td>
+      <td>기본 판정이 크기와 수정시각 비교라, 크기가 같고 같은 초에 쓰인 파일의 변경을 놓쳤다. 지표 파일처럼 숫자 몇 개만 바뀌는 경우가 정확히 이 함정이다. <b>동기화 도구의 판정 기준을 알고 쓴다.</b> 체크섬 비교로 바꿨다.</td></tr>
+    <tr><td>실행한 노트북을 회수했더니 결과가 비어 있음</td>
+      <td>편집기에서 노트북을 실행해도 파일에는 저장되지 않는다. 화면에 결과가 떠 있으니 성공한 줄 알았다. <b>화면에서 본 것과 파일에 남은 것은 다르다.</b></td></tr>
+    <tr><td>기억 시스템이 결정 여덟 건을 흘림</td>
+      <td>자동 요약을 맡긴 보조 모델이 하루치 의사결정을 기록할 내용 없음으로 판정했다. <b>자동화의 출력은 주기적으로 사람이 확인해야 한다.</b> 프롬프트를 구체화하고 더 큰 모델로 바꾸자 제대로 쌓였다.</td></tr>
+    <tr><td>여러 줄을 붙여넣자 비밀값이 오염됨</td>
+      <td>비밀번호 입력을 기다리는 명령이 다음 줄의 명령어를 값으로 삼켰다. 그 결과 실행되어야 할 명령이 사라졌다. <b>입력을 기다리는 명령은 한 줄씩 실행한다.</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="panel">
+    <h3>여덟 중 여섯은 같은 원인이었다</h3>
+    <p>기능을 잘못 만든 것이 아니라 <b>확인했다고 믿었지만 실제로는 확인하지 않은 것</b>에서
+    나왔다. 문법 검사는 통과했고, 문서의 옵션은 존재했고, 동기화는 성공했다고 보고했고,
+    화면에는 결과가 떠 있었다. 그런데 파일에는 아무것도 남지 않았거나 조용히 건너뛰었다.
+    확인의 단위를 작성했다에서 <b>돌려보고 결과물을 열어봤다</b>로 옮기는 것이 이 구간의
+    교훈이며, 이 교훈은 한 번 배운 뒤에도 하루 만에 다시 틀렸다.</p>
+  </div>
+
+  <div class="panel">
+    <h3>환경은 코드보다 먼저 깨진다</h3>
+    <p>모델 설계나 알고리즘에서 막힌 적은 아직 없다. 막힌 것은 전부 버전, 경로, 권한, 셸,
+    붙여넣기였다. 준비 구간의 시간이 어디로 가는지를 정직하게 보여주는 기록이라 남긴다.</p>
+  </div>
+</section>
+
+<section id="insight">
+  <div class="ch">08</div>
+  <h2>인사이트</h2>
+  <p class="section-lede">2026년 8월, 첫 준비 구간에서 배운 것들.</p>
+
+  <div class="panel"><h3>시장이 좁힌 문제가 모델을 살린다</h3>
+  <p>슬개골에서 시작한 것은 의학이 아니라 시장의 결정이었다. 인기 견종 상위권이 전부
+  고위험군이라는 사실이 확인되는 순간 <b>타깃과 데이터와 질환이 한 점에서 만났다.</b>
+  범용 펫 헬스 AI였다면 아무것도 검증하지 못했을 것이다.</p></div>
+
+  <div class="panel"><h3>공개 페이지 뒤에 스키마가 숨어 있다</h3>
+  <p>데이터셋의 라벨 구조는 공개 페이지에 없었다. 발표 영상을 프레임 단위로 판독해
+  복원했고, 그것이 <b>다리별 신호라는 제품 기능</b>이 되었다. 리서치가 곧 기능 기획이었다.</p></div>
+
+  <div class="panel"><h3>등급 진단이 아니라 징후 감지다</h3>
+  <p>수의학 문헌상 탈구 등급은 촉진으로 판정하며 등급과 절뚝임의 상관은 약하다.
+  초기 단계는 영상으로 원리상 거의 잡히지 않는다. 태스크를 <b>등급 진단에서 이상 징후
+  감지로 재정의</b>하자 모델 설계와 규제 리스크가 동시에 풀렸다.</p></div>
+
+  <div class="panel"><h3>위양성 관리가 UX이고 곧 사업이다</h3>
+  <p>이상 신호를 남발하면 병원에서 정상 판정을 받은 사용자가 이탈한다. 임계값은 특이도
+  우선으로 잡고, 촬영 품질이 낮으면 판정 대신 재촬영을 안내한다. <b>언어와 임계값과
+  UX 게이트가 하나의 체계</b>다.</p></div>
+
+  <div class="panel"><h3>합성 검증을 먼저 한 것이 가장 값어치했다</h3>
+  <p>실데이터가 없는 동안 인공 궤적에 파행 신호를 심고 학습 하네스가 그것을 되찾는지
+  확인했다. 처음엔 실패했고 기하 구조를 현실적으로 고친 뒤 통과했다. 덕분에 데이터가
+  도착하면 바로 학습으로 들어갈 수 있다. <b>데이터를 기다리는 시간에 파이프라인을
+  검증해 두는 것</b>이 준비 구간의 핵심이었다.</p></div>
+
+  <div class="panel"><h3>AI 협업의 경계선 두 줄</h3>
+  <p>이 프로젝트는 AI와 페어로 만든다. 지키는 원칙은 두 줄이다. <b>숫자를 만드는 일은
+  맡겨도 숫자를 읽고 결정하는 일은 내 몫이다. 화면을 만드는 일은 맡겨도 화면이 하는 말을
+  정하는 일은 내 몫이다.</b> 기억 하니스는 그 결정들을 잊지 않기 위한 장치다.</p></div>
+</section>
+
+<section id="log">
+  <div class="ch">09</div>
+  <h2>빌드 로그</h2>
+  <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
+  <div class="timeline">
+    <div class="tl"><div class="d">2026.08.10</div><div><h3>킥오프. 시장을 먼저, 모델은 수단으로</h3>
+      <p>경쟁 리서치로 빈 포지션을 확인했다. 기기 없이 카메라 30초와 월간 추적의 조합은 아무도 하지 않고 있었다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.10</div><div><h3>데이터셋 스키마 복원</h3>
+      <p>발표 영상 판독으로 비공개 라벨 구조를 복원했다. 14관절, 5등급, 다리별 좌우, 압력센서 정답지.</p></div></div>
+    <div class="tl"><div class="d">2026.08.10</div><div><h3>파이프라인 검증. 심은 신호를 되찾는가</h3>
+      <p>합성 궤적에 파행 신호를 주입하고 복원 실험을 했다. 처음엔 실패했고 기하를 고친 뒤 AUC 0.986.</p></div></div>
+    <div class="tl"><div class="d">2026.08.10</div><div><h3>iOS 스캐폴드. 촬영부터 공유 카드까지</h3>
+      <p>온디바이스 변환 검증과 시뮬레이터 전체 플로우 확인.</p></div></div>
+    <div class="tl"><div class="d">2026.08.11</div><div><h3>이름 여정 시작, 사이트 오픈</h3>
+      <p>후보 3라운드를 거쳤다. 네이밍도 빌드 인 퍼블릭.</p></div></div>
+    <div class="tl"><div class="d">2026.08.14</div><div><h3>이름 확정, 백본 결정</h3>
+      <p>브리드별 위험도 리서치, 단계별 파인튜닝 계획, 규제 로드맵을 확정했다. 병원 연계를 화면에 내장한 7화면 컨셉도 이날 나왔다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.19</div><div><h3>시장의 실제 숫자를 먼저 보다</h3>
+      <p>유사 앱의 공시와 실적을 조사해 기준선을 교체했다. 수익원 순서를 구독에서 병원 연계로 뒤집었다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.19</div><div><h3>규모 재검토. 학습은 확대, 배포는 유지</h3>
+      <p>큰 모델이 항상 낫지 않다는 것을 벤치마크로 확인했다. 교사 모델로 상한을 재는 실험을 설계에 추가했다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.20</div><div><h3>학습 서버 환경 구성</h3>
+      <p>원격 워크스테이션에 코드를 옮기고 실행 환경을 세웠다. 이 과정에서 깨진 여덟 가지를 07장에 정리했다. 결과는 한 방향으로만 회수하는 구조로 정리했다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.20</div><div><h3>데이터 이용 승인, 학습 착수</h3>
+      <p>필요한 데이터셋 네 종의 이용 승인을 받고 내려받기를 시작했다. 그와 병렬로 학습 환경의 처리량을 실측해 파인튜닝 소요 시간을 확정한다.</p></div></div>
+    <div class="tl future"><div class="d">NEXT</div><div><h3>실데이터 학습, 평가를 직접 판단</h3>
+      <p>학습 완주 후 민감도와 특이도 게이트 통과 여부를 스스로 판정하는 것이 다음 마일스톤이다.</p></div></div>
+    <div class="tl future"><div class="d">THEN</div><div><h3>실기기 검증과 출시</h3>
+      <p>실제 강아지로 검증하고 한국 우선 출시. 이후 질환 확장, 그다음 고양이.</p></div></div>
+  </div>
+</section>
+
+<p class="note">Dogtor의 모든 결과는 스크리닝 참고용이며 의학적 진단이 아닙니다.
+이상 신호와 무관하게 반려견의 정기 검진을 권장합니다.</p>
+
+<footer>
+  <a href="index.html">개요로 돌아가기</a> &nbsp; <a href="https://github.com/jsonpassion">github.com/jsonpassion</a>
+</footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById("themeToggle");
+    function cur() { return document.documentElement.dataset.theme || "dark"; }
+    function paint() { btn.textContent = cur() === "dark" ? "☀️" : "🌙"; }
+    btn.addEventListener("click", function () {
+      var next = cur() === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("dogtor-theme", next);
+      paint();
+    });
+    paint();
+  })();
+
+  (function () {
+    var links = [].slice.call(document.querySelectorAll("#toc a"));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+    var secs = Object.keys(map).map(function (id) { return document.getElementById(id); });
+    var active = null;
+    function update() {
+      var bar = document.getElementById("topbar").offsetHeight;
+      var cur = null;
+      for (var i = 0; i < secs.length; i++) {
+        if (secs[i].getBoundingClientRect().top <= bar + 100) cur = secs[i].id;
+      }
+      if (cur === active) return;
+      active = cur;
+      links.forEach(function (a) { a.classList.remove("active"); });
+      if (cur && map[cur]) map[cur].classList.add("active");
+    }
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+  })();
+</script>
+</body>
+</html>
