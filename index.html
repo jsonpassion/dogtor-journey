@@ -78,15 +78,18 @@
   <div class="ch">03</div>
   <h2>지금 어디까지</h2>
   <p class="section-lede">완료 표기는 실데이터와 실사용 검증까지 끝난 항목에만 쓴다.
-  지금 단계의 실체는 대부분 설계와 준비다.</p>
+  라벨 10만 건은 전수 검증을 마쳤고, 그 결과로 모델 설계를 두 군데 되돌렸다.
+  원천 데이터는 아직 받는 중이다.</p>
 
   <div class="stats">
     <div class="stat"><span class="num">0.986</span>
       <span class="lbl">학습 하네스 검증 AUC. 합성 신호 기준이며 실데이터 수치가 아니다</span></div>
     <div class="stat"><span class="num">388KB</span>
       <span class="lbl">온디바이스 분류기 크기. 가중치는 아직 학습 전이다</span></div>
-    <div class="stat"><span class="num">14</span>
-      <span class="lbl">복원한 골성 랜드마크 수. 실데이터 대조는 아직이다</span></div>
+    <div class="stat"><span class="num">12</span>
+      <span class="lbl">실데이터의 골성 랜드마크 수. 14개로 가정했으나 실측은 12개였다</span></div>
+    <div class="stat"><span class="num">1,572</span>
+      <span class="lbl">분류기가 쓸 수 있는 표본 전부. 측면별로 센 값이다</span></div>
     <div class="stat"><span class="num">18</span>
       <span class="lbl">학습 처리량 실측. 초당 이미지, 공개 데이터 기준</span></div>
     <div class="stat"><span class="num">0</span>
@@ -96,12 +99,13 @@
   <div class="scroll-x"><table>
     <tbody>
     <tr><td>시장과 문제 정의</td><td class="st wip">리서치만 완료</td></tr>
-    <tr><td>데이터 스키마 복원</td><td class="st wip">검증 대기</td></tr>
+    <tr><td>데이터 스키마 복원</td><td class="st ok">라벨 전수 검증 완료</td></tr>
     <tr><td>아키텍처와 백본 결정</td><td class="st wip">실증 전</td></tr>
-    <tr><td>학습 파이프라인</td><td class="st wip">합성 검증만</td></tr>
+    <tr><td>학습 파이프라인</td><td class="st wip">실데이터에 맞춰 재설계 중</td></tr>
     <tr><td>학습 환경 구성</td><td class="st ok">완료</td></tr>
     <tr><td>학습 가능성 실측</td><td class="st ok">게이트 통과</td></tr>
-    <tr><td>실데이터 학습</td><td class="st wip">착수</td></tr>
+    <tr><td>원천 데이터 확보</td><td class="st wip">재다운로드 중</td></tr>
+    <tr><td>실데이터 학습</td><td class="st wait">시작 전</td></tr>
     <tr><td>실기기 검증과 출시</td><td class="st wait">시작 전</td></tr>
     </tbody>
   </table></div>
