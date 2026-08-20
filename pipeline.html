@@ -10,6 +10,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  const dark = (document.documentElement.dataset.theme || "dark") === "dark";
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "base",
+    themeVariables: {
+      background: dark ? "#151a20" : "#f2f1ed",
+      primaryColor: dark ? "#1b222a" : "#ffffff",
+      primaryTextColor: dark ? "#e6e9ef" : "#14181d",
+      primaryBorderColor: dark ? "#3a434f" : "#c9c5bc",
+      lineColor: dark ? "#7fb4d6" : "#1f6f9e",
+      fontFamily: "Archivo, 'Apple SD Gothic Neo', sans-serif",
+      fontSize: "14px"
+    },
+    flowchart: { curve: "basis", padding: 14 }
+  });
+</script>
 <script>
   (function () {
     var t = localStorage.getItem("dogtor-theme");
@@ -33,11 +51,12 @@
   <a href="#arch"><span class="n">03</span>파이프라인 구조</a>
   <a href="#backbone"><span class="n">04</span>백본과 규모 판단</a>
   <a href="#measure"><span class="n">05</span>학습 환경 실측</a>
-  <a href="#data"><span class="n">06</span>데이터와 스키마</a>
-  <a href="#memory"><span class="n">07</span>기억 하니스</a>
-  <a href="#stuck"><span class="n">08</span>막힌 지점들</a>
-  <a href="#insight"><span class="n">09</span>인사이트</a>
-  <a href="#log"><span class="n">10</span>빌드 로그</a>
+  <a href="#gates"><span class="n">06</span>무엇으로 결정하는가</a>
+  <a href="#data"><span class="n">07</span>데이터와 스키마</a>
+  <a href="#memory"><span class="n">08</span>기억 하니스</a>
+  <a href="#stuck"><span class="n">09</span>막힌 지점들</a>
+  <a href="#insight"><span class="n">10</span>인사이트</a>
+  <a href="#log"><span class="n">11</span>빌드 로그</a>
 </aside>
 
 <div class="wrap">
@@ -173,6 +192,23 @@
   <figcaption>그림 1. 점선 안이 전부 기기 위에서 실행된다.</figcaption>
   </figure>
 
+  <figure class="mmd">
+    <pre class="mermaid">
+flowchart LR
+  V["보행 영상<br/>30초"] --> P["관절 추출<br/>프레임마다 14점"]
+  P --> N["궤적 정규화<br/>크기와 방향 불변"]
+  N --> T["시계열 분류기<br/>좌우 대칭과 리듬"]
+  T --> D{"판정"}
+  D -->|"정상 범위"| R1["기록만 남기고<br/>다음 달 리마인더"]
+  D -->|"관찰 필요"| R2["한 달 뒤 재촬영<br/>변화 비교"]
+  D -->|"상담 권장"| R3["병원용 리포트<br/>수의사에게 제시"]
+  N -.->|"해석용 지표"| M["좌우 균형<br/>보폭 주기"]
+  M --> R2
+  M --> R3
+    </pre>
+    <figcaption>그림 2. 촬영에서 판정까지. 점선은 모델과 별도로 계산하는 해석용 지표다.</figcaption>
+  </figure>
+
   <div class="scroll-x"><table>
     <thead><tr><th style="width:33%">선택</th><th>이유</th></tr></thead>
     <tbody>
@@ -282,10 +318,97 @@
   <p>그래서 학습 스케줄을 아직 확정하지 않는다. 다음 측정은 입력 크기를 절반으로 줄여
   시간이 비례해 줄어드는지 보는 것이다. 비례하면 연산 병목이고, 거의 그대로면 입출력
   병목이다. 이 한 번의 측정이 <b>모델을 줄일지, 데이터 파이프라인을 고칠지</b>를 가른다.</p>
+
+  <h3>학습 곡선을 읽는 법</h3>
+  <figure class="shot">
+    <img src="img/results.png" alt="학습 지표 18개 패널 그리드">
+    <figcaption>그림 3. 5 epoch 학습의 전체 지표. 위가 학습, 아래가 검증이다.</figcaption>
+  </figure>
+
+  <div class="readguide">
+    <h3>이 그림에서 봐야 할 것</h3>
+    <ol>
+      <li><b>위아래 두 줄</b>: 윗줄은 학습 데이터, 아랫줄은 처음 보는 검증 데이터다.
+        둘이 함께 내려가면 정상이고, 학습만 내려가고 검증이 올라가면 과적합이다.
+        여기서는 둘 다 내려가므로 아직 과적합 구간이 아니다.</li>
+      <li><b>왼쪽 다섯 칸은 손실</b>: 낮을수록 좋다. <code>pose_loss</code>가 관절 위치
+        오차이고 우리에게 가장 중요하다. 9.5에서 6.7로 내려갔지만 아직 기울기가 가파르다.
+        더 배울 것이 남았다는 뜻이다.</li>
+      <li><b>오른쪽 네 칸은 성능</b>: 높을수록 좋다. 이름 끝의
+        <code>(B)</code>는 상자 곧 탐지, <code>(P)</code>는 포즈 곧 관절이다.</li>
+      <li><b>가장 중요한 대비</b>: <code>mAP50(B)</code>는 0.97까지 올라 거의 수렴했는데
+        <code>mAP50(P)</code>는 0.24에 머문다. <b>강아지를 찾는 일은 쉽고
+        관절을 정확히 짚는 일은 어렵다</b>는 것을 한눈에 보여준다.</li>
+      <li><b>주황 점선</b>: 추세선이다. 파란 실선이 점선보다 아래에 있으면 예상보다
+        빨리 좋아지고 있다는 신호다.</li>
+    </ol>
+  </div>
+
+  <h3>정답과 예측을 나란히 보면</h3>
+  <div class="pair">
+    <figure class="shot">
+      <img src="img/val_batch0_labels.jpg" alt="정답 관절 위치">
+      <figcaption>그림 4. 정답. 관절 위에 정확히 찍혀 있다.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="img/val_batch0_pred.jpg" alt="5 epoch 시점 예측">
+      <figcaption>그림 5. 5 epoch 예측. 상자는 정확하나 점은 흩어져 있다.</figcaption>
+    </figure>
+  </div>
+
+  <div class="readguide">
+    <h3>두 그림의 차이가 말하는 것</h3>
+    <ol>
+      <li><b>파란 상자</b>는 모델이 찾은 강아지의 위치다. 예측 쪽 상자에 붙은
+        <code>dog0.9</code>는 확신도 90퍼센트라는 뜻이다. 정답과 거의 같은 자리에
+        그려져 있고, 정답에 없는 뒤쪽 강아지까지 찾아냈다.</li>
+      <li><b>색색의 점</b>은 관절 24개다. 정답에서는 코와 눈과 발끝처럼
+        해부학적 위치에 정확히 놓여 있다.</li>
+      <li><b>예측에서는 점이 상자 안에 흩어져 있다.</b> 대충 강아지 몸 위이긴 하지만
+        관절 위는 아니다. 지표에서 포즈 정확도가 낮았던 이유가 이것이다.</li>
+      <li>이것은 <b>실패가 아니라 예상된 중간 상태</b>다. 사전학습 모델은 관절 17개를
+        알고 있었는데 이 데이터는 24개라, 관절을 짚는 마지막 층을 처음부터 다시
+        배우는 중이었다. 5 epoch는 그러기에 짧다.</li>
+      <li>우리가 확인하려던 것은 정확도가 아니라 <b>이 학습 방식이 작동하는가</b>였고,
+        점이 무작위에서 몸통 안쪽으로 모여든 것이 그 증거다.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="gates">
+  <div class="ch">06</div>
+  <h2>무엇으로 결정하는가</h2>
+  <p class="section-lede">직감으로 정하지 않기 위해 각 갈림길마다 통과 기준을 숫자로
+  미리 적어 두었다. 아래가 그 전체 구조다.</p>
+
+  <figure class="mmd">
+    <pre class="mermaid">
+flowchart TD
+  S1["S1 학습 가능성<br/>이 장비에서 도는가"] -->|"통과"| S2["S2 병목 특정<br/>연산인가 입출력인가"]
+  S1 -->|"실패"| ALT["백업 백본으로 전환"]
+  S2 -->|"연산 병목"| M1["모델을 가볍게"]
+  S2 -->|"입출력 병목"| M2["데이터 파이프라인 개선"]
+  M1 --> E1["E1 포즈 정확도<br/>내장 모델 대비 이득"]
+  M2 --> E1
+  E1 --> E2["E2 다운스트림 이득<br/>판정 성능이 올랐는가"]
+  E2 --> E6["E6 용량 상한<br/>큰 모델과의 격차"]
+  E6 -->|"차이 0.02 미만"| K["현행 유지<br/>병목은 라벨이다"]
+  E6 -->|"0.02에서 0.05"| DI["증류로 회수 시도"]
+  E6 -->|"0.05 이상"| BIG["큰 모델 탑재 검토"]
+  K --> G["출시 게이트<br/>특이도 0.90에서<br/>민감도 0.85 이상"]
+  DI --> G
+  BIG --> G
+    </pre>
+    <figcaption>그림 6. 실험 게이트 구조. 각 분기의 임계값은 코드에 상수로 박혀 있다.</figcaption>
+  </figure>
+
+  <div class="callout">이 구조의 핵심은 <b>결과를 보고 기준을 정하지 않는 것</b>이다.
+  기준을 먼저 적어두면 애매한 결과를 좋게 해석하려는 유혹이 줄어든다.
+  현재 S1을 통과했고 S2를 앞두고 있다.</div>
 </section>
 
 <section id="data">
-  <div class="ch">06</div>
+  <div class="ch">07</div>
   <h2>데이터와 스키마</h2>
   <p class="section-lede">공개 페이지에 없는 라벨 구조를 복원하는 것이 첫 관문이었다.</p>
 
@@ -321,7 +444,7 @@
 </section>
 
 <section id="memory">
-  <div class="ch">07</div>
+  <div class="ch">08</div>
   <h2>기억 하니스</h2>
   <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정과 스펙과 절차를
   자동으로 축적하는 로컬 시스템을 만들었다.</p>
@@ -367,7 +490,7 @@
 </section>
 
 <section id="stuck">
-  <div class="ch">08</div>
+  <div class="ch">09</div>
   <h2>막힌 지점들</h2>
   <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 알고리즘이 아니라
   환경과 검증 습관에서 나왔다.</p>
@@ -419,7 +542,7 @@
 </section>
 
 <section id="insight">
-  <div class="ch">09</div>
+  <div class="ch">10</div>
   <h2>인사이트</h2>
   <p class="section-lede">2026년 8월, 첫 준비 구간에서 배운 것들.</p>
 
@@ -455,7 +578,7 @@
 </section>
 
 <section id="log">
-  <div class="ch">10</div>
+  <div class="ch">11</div>
   <h2>빌드 로그</h2>
   <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
   <div class="timeline">
