@@ -54,10 +54,11 @@
   <a href="#gates"><span class="n">06</span>무엇으로 결정하는가</a>
   <a href="#data"><span class="n">07</span>데이터와 스키마</a>
   <a href="#schema"><span class="n">08</span>가정이 틀린 지점</a>
-  <a href="#memory"><span class="n">09</span>기억 하니스</a>
-  <a href="#stuck"><span class="n">10</span>막힌 지점들</a>
-  <a href="#insight"><span class="n">11</span>인사이트</a>
-  <a href="#log"><span class="n">12</span>빌드 로그</a>
+  <a href="#rework"><span class="n">09</span>설계를 바꾼 발견</a>
+  <a href="#memory"><span class="n">10</span>기억 하니스</a>
+  <a href="#stuck"><span class="n">11</span>막힌 지점들</a>
+  <a href="#insight"><span class="n">12</span>인사이트</a>
+  <a href="#log"><span class="n">13</span>빌드 로그</a>
 </aside>
 
 <div class="wrap">
@@ -454,8 +455,8 @@ flowchart TD
     <thead><tr><th style="width:26%">가정</th><th style="width:12%">결과</th><th>내용</th></tr></thead>
     <tbody>
     <tr><td>파일명 규칙</td><td class="st ok">맞음</td><td>병원과 촬영 일시와 프레임 번호 구조가 예상대로였다</td></tr>
-    <tr><td>세션 내 등급 일관성</td><td class="st ok">맞음</td><td>907개 세션 중 1건만 불일치. 0.1퍼센트라 무시 가능</td></tr>
-    <tr><td>다리별 좌우 등급</td><td class="st ok">맞음</td><td>좌우가 서로 다른 사례가 다수. 다리별 신호 기능의 근거가 확인되었다</td></tr>
+    <tr><td>세션 내 등급 일관성</td><td class="st wip">재검증</td><td>방향을 키에 넣어 다시 세자 한 구간 안에서 등급이 0에서 4까지 섞이는 사례가 드러났다. 현재는 최댓값을 쓰는데 이는 등급을 올리는 방향이라 특이도 우선 원칙과 어긋난다. 비율을 세는 중이다</td></tr>
+    <tr><td>다리별 좌우 등급</td><td class="st ok">맞음</td><td>좌우가 서로 다른 사례가 다수다. 다만 단위가 네 다리가 아니라 <b>좌우 무릎 둘</b>이었다. 설계를 바꾼 발견 장에서 이어진다</td></tr>
     <tr><td><b>관절 라벨</b></td><td class="st wip">틀림</td><td>14개 한글명을 가정했으나 <b>12개 영문 해부학명</b>이었다. 발끝이 좌우 2점이라는 추정도 틀렸다</td></tr>
     <tr><td><b>좌표 형식</b></td><td class="st wip">틀림</td><td>픽셀로 가정했으나 <b>이미 0에서 1로 정규화된 문자열</b>이었다</td></tr>
     <tr><td><b>세션 단위</b></td><td class="st wip">틀림</td><td>경로에 촬영 방향이 있는데 키에서 빠져 <b>4개 시퀀스가 하나로 뭉쳤다</b></td></tr>
@@ -471,7 +472,7 @@ flowchart TD
   <h3>맞은 것도 있었다</h3>
   <p>등급 분포는 공표치와 0.5퍼센트포인트 이내로 일치했다. 정상 55.7퍼센트,
   1기 9.6, 2기 14.4, 3기 17.5, 4기 2.8이다. 라벨의 의미 자체는 바르게 읽고 있었다는 뜻이다.
-  개체 단위 분할도 의도대로 동작해 학습과 평가에 같은 개가 겹치지 않는다.</p>
+  다만 개체 단위 분할은 아직 확정하지 못했다. 개체를 식별하는 키에 촬영 날짜를 넣으면 760마리가 되고 빼면 179마리가 되는데, 전자는 같은 개가 다른 날 오면 갈라져 학습과 평가에 함께 들어갈 수 있고 후자는 서로 다른 개를 하나로 묶는다. <b>어느 쪽도 정답이 아니므로 두 기준으로 모두 평가하고 그 차이를 누수의 크기로 함께 보고한다.</b></p>
 
   <h3>데이터가 시장과 겹친다</h3>
   <p>견종 분포 상위가 푸들, 말티즈, 비숑, 치와와, 포메라니안이다. 이 프로젝트가
@@ -539,8 +540,121 @@ flowchart TD
 
 </section>
 
-<section id="memory">
+<section id="rework">
   <div class="ch">09</div>
+  <h2>설계를 바꾼 발견</h2>
+  <p class="section-lede">라벨을 더 깊이 파고들자 스키마 수준의 오류가 아니라
+  모델 설계 자체를 다시 세워야 하는 사실 넷이 나왔다. 원천 데이터를 받는 동안
+  라벨만으로 확인할 수 있는 것을 전부 확인한 결과다.</p>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th style="width:22%">발견</th><th style="width:26%">전제였던 것</th><th>실제</th></tr></thead>
+    <tbody>
+    <tr><td><b>라벨의 범위</b></td><td>영상 전체가 라벨링되어 있다</td>
+      <td>긴 영상에서 <b>연속 20여 프레임 한 토막</b>만 라벨링되어 있다. 프레임 번호가 155나 247에서 시작한다</td></tr>
+    <tr><td><b>시계열 길이</b></td><td>15프레임으로 10초, 150프레임 창</td>
+      <td>방향 구간의 중앙값이 <b>22프레임</b>이다. 150프레임 창을 채우는 구간은 1.3퍼센트뿐이었다</td></tr>
+    <tr><td><b>관절의 구성</b></td><td>네 다리의 발끝을 각각 추적한다</td>
+      <td>12개가 전부 외측 랜드마크로 <b>한쪽 면뿐</b>이다. 앞다리 하나 뒷다리 하나다</td></tr>
+    <tr><td><b>쓸 수 있는 시점</b></td><td>네 방향을 모두 쓴다</td>
+      <td>측면 둘만 안정적이다. <b>정면은 라벨 집합이 33종</b>으로 매번 다르다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>가장 위험했던 것은 시계열 길이였다</h3>
+  <p>입력을 고정 길이로 맞추는 코드가 짧은 구간을 0으로 채우고 있었다.
+  창이 150이고 실제가 22면 <b>입력 텐서의 85퍼센트가 0</b>이다.
+  게다가 좌표가 0에서 1로 정규화되어 있으므로 0은 빈 값이 아니라
+  관절이 원점에 있다는 뜻이 된다. 존재하지 않는 자세를 8할 넘게 먹이는 셈이다.</p>
+  <div class="callout">학습은 오류 없이 돌아간다. 손실도 내려간다. 다만 모델이 배우는 것은
+  보행이 아니라 <b>패딩의 양</b>이다. 채워진 프레임 수가 촬영 길이와 상관되므로
+  그럴듯한 정확도까지 나온다. <b>실패가 성공처럼 보이는 종류</b>라 실측 없이는
+  끝까지 발견되지 않는다.</div>
+  <p>창을 24로 내리고, 0 패딩을 마지막 프레임 반복으로 바꿨다. 24는 실측 중앙값
+  22에 가장 가까워 크롭과 패딩이 모두 최소가 되는 값이다. 증강의 시간 크롭 조건도
+  45프레임 이상이라 한 번도 발동하지 않고 있었다.</p>
+
+  <h3>측면이 하나뿐이라는 사실이 설계를 바꿨다</h3>
+  <p>파행 판정의 1차 신호는 좌우 비대칭이다. 그런데 한 프레임에 한쪽 다리만 있으면
+  프레임 안에서 좌우를 비교할 수 없다. 비교의 단위가 프레임에서 시점으로 올라간다.</p>
+  <p>라벨을 다시 보니 데이터가 처음부터 이 구조를 전제하고 있었다.
+  등급이 좌우 무릎별로 따로 매겨져 있다. <b>왼쪽 측면 영상으로 왼쪽 무릎을,
+  오른쪽 측면 영상으로 오른쪽 무릎을 예측한다.</b> 좌우를 한 덩어리로 합치려던
+  원안보다 자연스럽고, 표본도 두 배가 된다. 제품이 약속한 어느 쪽 무릎인지에 대한
+  답도 여기서 직접 나온다.</p>
+
+  <figure class="viz">
+  <svg viewBox="0 0 620 190" role="img" aria-label="하나의 연속 촬영이 네 개의 방향 구간으로 나뉘는 구조">
+    <defs>
+      <style>
+        @keyframes sweep { 0% { opacity:.25 } 50% { opacity:1 } 100% { opacity:.25 } }
+        .segR { animation: sweep 6s ease-in-out infinite; }
+        .segL { animation: sweep 6s ease-in-out infinite 1.5s; }
+        .segF { animation: sweep 6s ease-in-out infinite 3s; }
+        .segB { animation: sweep 6s ease-in-out infinite 4.5s; }
+      </style>
+    </defs>
+    <text class="sk-t" x="20" y="26">하나의 연속 촬영</text>
+    <text class="sk-s" x="20" y="44">프레임 번호가 이어진다. 카메라 네 대가 아니다</text>
+
+    <rect class="sk-soft" x="20" y="62" width="580" height="34" rx="4"/>
+    <g class="segR"><rect class="sk-box" x="24" y="66" width="150" height="26" rx="3"/></g>
+    <g class="segL"><rect class="sk-box" x="178" y="66" width="112" height="26" rx="3"/></g>
+    <g class="segF"><rect class="sk-box" x="308" y="66" width="150" height="26" rx="3"/></g>
+    <g class="segB"><rect class="sk-box" x="462" y="66" width="134" height="26" rx="3"/></g>
+
+    <text class="sk-a" x="66" y="84">Right</text>
+    <text class="sk-a" x="212" y="84">Left</text>
+    <text class="sk-a" x="356" y="84">Front</text>
+    <text class="sk-a" x="506" y="84">Back</text>
+
+    <text class="sk-s" x="24" y="112">1</text>
+    <text class="sk-s" x="160" y="112">68</text>
+    <text class="sk-s" x="178" y="112">69</text>
+    <text class="sk-s" x="272" y="112">118</text>
+    <text class="sk-s" x="308" y="112">126</text>
+    <text class="sk-s" x="436" y="112">191</text>
+    <text class="sk-s" x="462" y="112">193</text>
+    <text class="sk-s" x="574" y="112">250</text>
+
+    <path class="sk-hi" d="M178 60 h112 v40 h-112 z"/>
+    <path class="sk-hi" d="M24 60 h150 v40 h-150 z"/>
+    <text class="sk-s" x="20" y="146">측면 둘만 관절 12개가 안정적으로 라벨링된다.</text>
+    <text class="sk-s" x="20" y="164">정면과 후면은 가림 때문에 매번 다른 8개에서 9개가 남는다.</text>
+    <text class="sk-s" x="20" y="182">빈 구간 119에서 125는 시점이 전환되는 순간이다.</text>
+  </svg>
+  <div class="legend">
+    <span><i style="background:var(--accent)"></i>분류에 쓰는 구간</span>
+    <span><i style="background:var(--sub)"></i>포즈 학습에만 쓰는 구간</span>
+  </div>
+  <figcaption>그림 8. 방향은 카메라가 아니라 하나의 촬영을 나눈 시간 구간이다.</figcaption>
+  </figure>
+
+  <h3>실질 표본은 생각보다 훨씬 작다</h3>
+  <div class="stats">
+    <div class="stat"><span class="num">100,874</span>
+      <span class="lbl">라벨 프레임. 포즈 모델 학습에는 이 전부를 쓴다</span></div>
+    <div class="stat"><span class="num">904</span>
+      <span class="lbl">촬영 건수. 연속 프레임이라 프레임 수만큼 독립적이지 않다</span></div>
+    <div class="stat"><span class="num">786</span>
+      <span class="lbl">좌우 측면을 모두 갖춘 촬영. 전체의 86.9퍼센트</span></div>
+    <div class="stat"><span class="num">1,572</span>
+      <span class="lbl">측면별로 세었을 때 분류기가 쓸 수 있는 표본 전부</span></div>
+  </div>
+  <p>등급이 다섯 단계인데 표본이 1,572건이다. 백본 문서에서 큰 모델의 이득이
+  포화한다는 실측을 근거로 배포 모델을 키우지 않기로 했고, 그때 <b>병목이 모델 용량이
+  아니라 라벨일 가능성</b>을 함께 적어두었다. 그 가능성이 사실 쪽으로 기울고 있다.
+  남는 컴퓨팅은 모델을 키우는 데가 아니라 증강과 라벨 정제에 쓰는 것이 맞다.</p>
+
+  <h3>아직 확정하지 않은 것</h3>
+  <div class="callout">방향 이름의 <b>Left가 카메라 위치인지 진행 방향인지 모른다.</b>
+  후자라면 왼쪽 영상에 오른쪽 다리가 찍히고 좌우 등급 매핑이 통째로 뒤집힌다.
+  원천 이미지 몇 장을 눈으로 보면 끝나는 확인이므로, <b>확인 전에는 이 매핑에 기대는
+  코드를 쓰지 않는다.</b> 지금 쓰면 가정이 뒤집혔을 때 전부 다시 써야 한다.</div>
+</section>
+
+<section id="memory">
+  <div class="ch">10</div>
   <h2>기억 하니스</h2>
   <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정과 스펙과 절차를
   자동으로 축적하는 로컬 시스템을 만들었다.</p>
@@ -586,7 +700,7 @@ flowchart TD
 </section>
 
 <section id="stuck">
-  <div class="ch">10</div>
+  <div class="ch">11</div>
   <h2>막힌 지점들</h2>
   <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 알고리즘이 아니라
   환경과 검증 습관에서 나왔다.</p>
@@ -612,6 +726,10 @@ flowchart TD
       <td>공식 다운로더가 분할 조각을 문자열 순으로 이어 붙인다. 조각 이름이 바이트 오프셋이라 자릿수가 늘어나는 순간 순서가 뒤집힌다. 10GB 미만 파일에서는 드러나지 않아 작은 것 셋은 무사했다. <b>크기가 맞다고 내용이 맞는 것은 아니다.</b></td></tr>
     <tr><td>검증 기준을 두 번 연속 잘못 잡음</td>
       <td>압축 파일의 항목 수를 세는 데 디렉토리까지 포함해 비율을 왜곡했고, 그 잘못된 숫자로 정상인 데이터를 손상으로 오판했다. 반대로 다른 하나는 통과시켜 원본을 지워버렸다. <b>검증 로직 자체가 검증되지 않으면 검증이 아니다.</b></td></tr>
+    <tr><td>7시간을 받은 40GB가 오류 하나 없이 깨져 있음</td>
+      <td>공식 다운로더가 전송 실패를 감지하지 못한다. 종료 코드를 내려받기 명령이 아니라 그 뒤에 실행된 문자열 처리 명령에서 읽고 있었다. 그래서 전송이 끊겨도 항상 성공으로 판정하고, 잘린 압축 파일을 그대로 병합한 뒤 <b>재개에 쓸 원본까지 지웠다.</b> 받은 크기가 47.6GB가 아니라 40.8GB였다는 사실은 파일을 열어보고서야 드러났다. <b>조용히 실패하는 것이 가장 위험하다.</b></td></tr>
+    <tr><td>수정한 패치가 문법 검사는 통과하고 동작은 틀림</td>
+      <td>치환 문자열의 역참조가 백슬래시 처리에 밀려 글자 그대로 박혔다. 결과 스크립트는 문법상 옳아 검사를 통과했지만 실행하면 엉뚱한 명령이 된다. 실제 대상 파일에 적용해 결과 줄을 눈으로 확인하고서야 발견했다. <b>같은 교훈을 두 번째로 배웠다.</b></td></tr>
     <tr><td>여러 줄을 붙여넣자 비밀값이 오염됨</td>
       <td>비밀번호 입력을 기다리는 명령이 다음 줄의 명령어를 값으로 삼켰다. 그 결과 실행되어야 할 명령이 사라졌다. <b>입력을 기다리는 명령은 한 줄씩 실행한다.</b></td></tr>
     </tbody>
@@ -642,7 +760,7 @@ flowchart TD
 </section>
 
 <section id="insight">
-  <div class="ch">11</div>
+  <div class="ch">12</div>
   <h2>인사이트</h2>
   <p class="section-lede">2026년 8월, 첫 준비 구간에서 배운 것들.</p>
 
@@ -685,7 +803,7 @@ flowchart TD
 </section>
 
 <section id="log">
-  <div class="ch">12</div>
+  <div class="ch">13</div>
   <h2>빌드 로그</h2>
   <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
   <div class="timeline">
