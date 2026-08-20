@@ -186,6 +186,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
       <a href="#status">구축 현황</a>
       <a href="#hermes">헤르메스</a>
       <a href="#insights">인사이트</a>
+      <a href="#stuck">막힌 지점</a>
       <a href="#log">빌드 로그</a>
     </div>
     <button id="themeToggle" aria-label="다크 라이트 모드 전환" title="다크 라이트 모드 전환">🌙</button>
@@ -200,7 +201,8 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
   <a href="#status"><span class="n">04</span>구축 현황</a>
   <a href="#hermes"><span class="n">05</span>헤르메스 하니스</a>
   <a href="#insights"><span class="n">06</span>인사이트</a>
-  <a href="#log"><span class="n">07</span>빌드 로그</a>
+  <a href="#stuck"><span class="n">07</span>막힌 지점들</a>
+  <a href="#log"><span class="n">08</span>빌드 로그</a>
 </aside>
 
 <div class="wrap" id="top">
@@ -354,6 +356,11 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
     <tr><td>특이도 우선 임계값</td><td>스크리닝의 최대 리스크는 위양성이다. 병원에 갔는데 정상이라는 경험이 반복되면 신뢰가 무너진다.</td></tr>
     </tbody>
   </table></div>
+
+  <p>학습은 통합메모리 192GiB에 24코어인 Apple Silicon 워크스테이션에서 원격으로 수행한다.
+  메모리가 넉넉해 배치 크기에 제약이 없고, 온디바이스에 올릴 수 없는 큰 모델을 교사로 세워
+  정확도의 상한을 재는 실험까지 가능하다. 다만 같은 연산량 기준으로 전용 GPU보다 느리므로
+  학습 시간은 넉넉히 잡는다.</p>
 </section>
 
 <section id="status">
@@ -482,8 +489,43 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
   일은 내 몫이다.</b> 헤르메스는 그 결정들을 잊지 않기 위한 장치다.</p></div>
 </section>
 
-<section id="log">
+<section id="stuck">
   <div class="ch">Ch. 07</div>
+  <h2>막힌 지점들</h2>
+  <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 기능이 아니라
+  환경과 검증 습관에서 나왔다.</p>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th style="width:30%">증상</th><th>원인과 교훈</th></tr></thead>
+    <tbody>
+    <tr><td>파일 전송이 시작도 못 하고 죽음</td>
+      <td>운영체제에 기본 탑재된 동기화 도구가 2006년 버전과 호환되는 구현이라, 최신 문서에 나오는 옵션이 아예 없었다. <b>플랫폼 기본 도구의 실제 버전을 확인하고 쓴다.</b></td></tr>
+    <tr><td>모델 변환이 조용히 실패</td>
+      <td>딥러닝 프레임워크의 최신 버전이 변환 도구의 검증 범위를 벗어났다. 경고만 뜨고 진행되다가 변환 단계에서 깨진다. <b>배포 경로의 의존성은 버전을 고정한다.</b></td></tr>
+    <tr><td>환경 구성이 절반만 된 채 종료</td>
+      <td>무거운 선택 의존성 하나가 빌드에 실패했는데, 스크립트가 오류에서 즉시 중단되도록 설정되어 있어 나머지 필수 패키지까지 설치되지 않았다. <b>실패 가능성이 높은 선택 의존성은 분리해서 설치한다.</b></td></tr>
+    <tr><td>문법 검사를 통과한 스크립트가 실행 중 죽음</td>
+      <td>운영체제 기본 셸이 2007년 버전이라, 빈 배열을 다루는 방식이 현대 버전과 달랐다. 문법은 옳고 실행만 실패하는 종류였다. <b>셸 스크립트는 문법 검사가 아니라 실행까지 확인한다.</b></td></tr>
+    <tr><td>동기화가 바뀐 파일을 건너뜀</td>
+      <td>기본 판정이 크기와 수정시각 비교라, 크기가 같고 같은 초에 쓰인 파일의 변경을 놓쳤다. 지표 파일처럼 숫자 몇 개만 바뀌는 경우가 정확히 이 함정이다. <b>동기화 도구의 판정 기준을 알고 쓴다.</b> 체크섬 비교로 바꿨다.</td></tr>
+    <tr><td>기억 시스템이 결정 여덟 건을 흘림</td>
+      <td>자동 요약을 맡긴 보조 모델이 하루치 의사결정을 "기록할 내용 없음"으로 판정했다. <b>자동화의 출력은 주기적으로 사람이 확인해야 한다.</b> 프롬프트를 구체화하고 더 큰 모델로 바꾸자 열한 줄이 제대로 쌓였다.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="insight"><h3>여섯 중 넷은 같은 원인이었다</h3>
+  <p>기능을 잘못 만든 것이 아니라 <b>검증했다고 믿었지만 실제로 실행해보지 않은 것</b>에서 나왔다.
+  문법 검사는 통과했고, 문서의 옵션은 존재했고, 동기화는 성공했다고 보고했다. 그런데 실제로는
+  돌지 않았거나 조용히 건너뛰었다. 확인의 단위를 "작성했다"에서 "돌려봤다"로 옮기는 것이
+  이 구간에서 가장 값비싸게 배운 것이다.</p></div>
+
+  <div class="insight"><h3>환경은 코드보다 먼저 깨진다</h3>
+  <p>모델 설계나 알고리즘에서 막힌 적은 아직 없다. 막힌 것은 전부 버전, 경로, 권한, 셸이었다.
+  준비 구간의 시간이 어디로 가는지를 정직하게 보여주는 기록이라 남긴다.</p></div>
+</section>
+
+<section id="log">
+  <div class="ch">Ch. 08</div>
   <h2>빌드 로그</h2>
   <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
   <div class="timeline">
@@ -505,6 +547,8 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
       <p>병원 연계 3축을 화면에 내장한 7화면 컨셉. 백본은 후보 6종 정량 비교로 RTMPose-m 본선 확정. 원격 학습 스크립트와 실험 리더보드 체계 구축.</p></div></div>
     <div class="tl"><div class="d">2026.08.19</div><div><h3>시장의 실제 숫자를 먼저 보다</h3>
       <p>유사 앱의 공시와 실적을 조사해 기준선을 교체했다. 선두 사업자의 손익과 최유사 서비스의 회원당 매출을 확인한 뒤 수익원 순서를 구독에서 병원 연계로 뒤집었다.</p></div></div>
+    <div class="tl"><div class="d">2026.08.20</div><div><h3>학습 서버 환경 구성</h3>
+      <p>원격 워크스테이션에 코드를 옮기고 실행 환경을 세웠다. 이 과정에서 깨진 여섯 가지를 07장에 정리했다. 양방향 동기화는 쓰지 않고 결과를 한 방향으로만 회수하는 구조로 정리했다.</p></div></div>
     <div class="tl future"><div class="d">NEXT</div><div><h3>실데이터 학습, 평가를 직접 판단</h3>
       <p>서버 학습 완주 후 민감도와 특이도 게이트 통과 여부를 스스로 판정하는 것이 다음 마일스톤.</p></div></div>
     <div class="tl future"><div class="d">THEN</div><div><h3>실기기 검증, TestFlight, 출시</h3>
@@ -516,7 +560,7 @@ footer { padding: 40px 0 8px; font-size: 14px; color: var(--sub); }
 이상 신호와 무관하게 반려견의 정기 검진을 권장합니다.</p>
 
 <footer>
-  <a href="https://github.com/jsonpassion">@jsonpassion</a>, Apple Developer Academy
+  <a href="https://github.com/jsonpassion">@jsonpassion</a>
 </footer>
 
 </div>
