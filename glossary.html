@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>용어 사전 — Dogtor 독터</title>
+<meta name="description" content="Dogtor 여정 기록에 나오는 수의학, 머신러닝, 데이터 용어를 처음 접하는 사람 기준으로 풀어 쓴 사전.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var t = localStorage.getItem("dogtor-theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  })();
+</script>
+</head>
+<body>
+
+<div id="topbar"><div class="tb">
+  <a class="brand" href="index.html">Dogtor</a>
+  <span class="spacer"></span>
+  <a class="nav" href="index.html">개요</a>
+  <a class="nav" href="pipeline.html">파이프라인 해부</a>
+  <a class="nav on" href="glossary.html">용어 사전</a>
+  <button id="themeToggle" aria-label="다크 라이트 전환" title="다크 라이트 전환">🌙</button>
+</div></div>
+
+<div class="wrap narrow">
+
+<header class="hero" style="padding: 10vh 0 6vh">
+  <span class="kicker">Glossary</span>
+  <h1 style="font-size: clamp(34px, 5.5vw, 56px)">용어 사전</h1>
+  <p class="lede">여정 기록에 나오는 용어를 처음 접하는 사람 기준으로 풀어 썼다.
+  정의 다음에는 이 프로젝트에서 그 용어가 실제로 어떤 일을 했는지를 붙였다.
+  이론보다 그 문장이 기억에 남는다.</p>
+  <input id="glFilter" type="search" placeholder="용어 검색  (예: 특이도, AUC, 슬개골)"
+    aria-label="용어 검색">
+</header>
+
+<section id="vet">
+  <div class="ch">01</div>
+  <h2>수의학과 몸</h2>
+  <dl class="gl">
+    <div class="term" id="mpl"><dt>슬개골 탈구 <span class="en">MPL, Medial Patellar Luxation</span></dt>
+    <dd>무릎 앞의 작은 뼈(슬개골)가 제자리 홈에서 안쪽으로 빠지는 병. 소형견에서 매우 흔하다.
+    <b>이 프로젝트에서는</b> 앱이 찾으려는 대상 그 자체다. 한국에서 많이 기르는 말티즈, 푸들,
+    포메라니안이 모두 고위험 견종이라 시장과 병이 정확히 겹친다.</dd></div>
+
+    <div class="term" id="grade"><dt>등급 1기 ~ 4기</dt>
+    <dd>슬개골 탈구의 심한 정도. 1기는 밀면 빠지지만 스스로 돌아오는 수준, 4기는 항상 빠져
+    있고 손으로도 돌아오지 않는 수준. <b>수의사가 무릎을 손으로 만져서(촉진) 매긴다.</b>
+    이 프로젝트의 결정적 발견이 여기 있다. 만져서 매긴 등급이라 짧은 걸음 영상에는
+    그 정보가 담겨 있지 않았다.</dd></div>
+
+    <div class="term" id="lameness"><dt>파행 <span class="en">lameness</span></dt>
+    <dd>절뚝거림. 다리에 통증이나 이상이 있어 걸음이 비대칭이 되는 것.
+    <b>이 프로젝트에서는</b> 영상으로 잡으려던 신호다. 슬개골 등급과 파행은 다른 개념이라는
+    것이 실험으로 확인됐다. 등급이 높아도 걸음이 멀쩡한 개가 많다.</dd></div>
+
+    <div class="term" id="palpation"><dt>촉진 <span class="en">palpation</span></dt>
+    <dd>손으로 만져서 진단하는 것. 슬개골 등급은 정지 상태에서 무릎을 밀어보며 매긴다.
+    <b>이 프로젝트에서는</b> 분류기가 실패한 이유를 설명하는 열쇠다. 촉진으로 만든 라벨을
+    걸음 영상으로 맞히려 한 것이 애초에 어긋난 짝이었다.</dd></div>
+
+    <div class="term" id="landmark"><dt>골성 랜드마크 <span class="en">bony landmark</span></dt>
+    <dd>피부 위에서 만져지거나 보이는 뼈의 기준점. 관절 위치를 일관되게 찍기 위한 표준 지점이다.
+    <b>이 프로젝트의 데이터는</b> 귀, 등뼈 T13, 견갑극, 견봉, 팔꿈치, 손목, 앞발끝, 장골능선,
+    대전자, 무릎, 비절, 뒷발끝 12개를 쓴다. 전부 몸의 한쪽 면 기준이라는 것이
+    설계를 바꾼 발견이었다.</dd></div>
+
+    <div class="term" id="hock"><dt>비절 <span class="en">hock</span></dt>
+    <dd>뒷다리의 발목. 사람 발목과 달리 공중에 떠 있어 뒤로 꺾인 것처럼 보이는 관절.
+    무릎 문제가 있으면 비절의 움직임도 함께 달라져서 보행 분석에서 중요하다.</dd></div>
+
+    <div class="term" id="gaitcycle"><dt>보행 주기 <span class="en">gait cycle</span></dt>
+    <dd>한 발이 땅에 닿았다가 다시 닿을 때까지의 한 사이클. 개의 총총걸음 기준 대략 0.4초.
+    <b>이 프로젝트에서는</b> 시퀀스 길이가 충분한지 판단하는 자였다. 21프레임이면
+    주기 서너 개가 담기므로 길이 부족은 실패 원인에서 지워졌다.</dd></div>
+  </dl>
+</section>
+
+<section id="metrics">
+  <div class="ch">02</div>
+  <h2>판정을 재는 숫자</h2>
+  <dl class="gl">
+    <div class="term" id="sens"><dt>민감도 <span class="en">sensitivity</span></dt>
+    <dd>실제로 병이 있는 개 중에서 병이 있다고 맞게 판정한 비율. 100마리가 아픈데 85마리를
+    잡으면 민감도 85%다. <b>이 프로젝트의 출시 기준은</b> 2기 이상에서 민감도 85%였다.
+    실측은 11%에 그쳐 판정 불가 결론의 근거가 됐다.</dd></div>
+
+    <div class="term" id="spec"><dt>특이도 <span class="en">specificity</span></dt>
+    <dd>실제로 건강한 개 중에서 건강하다고 맞게 판정한 비율. 특이도가 낮으면 멀쩡한 개를
+    아프다고 겁주게 된다. <b>이 프로젝트는 특이도를 90%로 먼저 고정</b>하고 그 조건에서
+    민감도를 쟀다. 스크리닝 앱의 최대 위협은 놓치는 것보다 겁주는 것이기 때문이다.</dd></div>
+
+    <div class="term" id="fp"><dt>위양성 / 위음성 <span class="en">false positive / negative</span></dt>
+    <dd>위양성은 건강한데 아프다고 한 것, 위음성은 아픈데 건강하다고 한 것.
+    의료 검사는 이 둘의 균형이 전부다. <b>이 프로젝트에서는</b> 위양성 관리가 사용자 경험이자
+    사업이라고 판단했다. 병원에서 정상 판정을 받은 보호자는 앱을 떠난다.</dd></div>
+
+    <div class="term" id="auc"><dt>AUC</dt>
+    <dd>판별력을 0.5에서 1.0 사이 숫자 하나로 요약한 값. 아픈 개와 건강한 개를 한 마리씩
+    무작위로 뽑았을 때 모델이 아픈 쪽에 더 높은 점수를 줄 확률이다. <b>0.5는 동전 던지기,
+    1.0은 완벽.</b> 이 프로젝트의 모든 분류 시도가 0.48에서 0.60 사이에 머물렀고,
+    스크리닝 최소선으로 잡은 0.75에 못 미쳐 판정 불가 결론이 났다.</dd></div>
+
+    <div class="term" id="threshold"><dt>임계값 <span class="en">threshold</span></dt>
+    <dd>모델이 내놓는 0에서 1 사이 점수를 "이상 신호 있음/없음"으로 가르는 기준선.
+    임계값을 올리면 특이도가 오르고 민감도가 내려간다. <b>이 프로젝트에서는</b> 특이도 90%가
+    되는 지점으로 임계값을 자동 보정했다.</dd></div>
+
+    <div class="term" id="recall5"><dt>등급별 재현율</dt>
+    <dd>각 등급의 개를 그 등급으로 맞게 분류한 비율. 평균 하나로 뭉치면 드문 등급(4기)의
+    실패가 가려지므로 등급마다 따로 본다. <b>이 프로젝트에서는</b> 4기 재현율이 0%였다.
+    표본이 36건뿐이라 모델이 그 등급을 사실상 배우지 못했다.</dd></div>
+  </dl>
+</section>
+
+<section id="ml">
+  <div class="ch">03</div>
+  <h2>모델과 학습</h2>
+  <dl class="gl">
+    <div class="term" id="pose"><dt>자세추정 <span class="en">pose estimation</span></dt>
+    <dd>사진 속 몸의 관절 위치를 좌표로 찾아내는 기술. 사람 자세추정이 원조이고
+    동물용은 데이터가 훨씬 적다. <b>이 프로젝트에서는</b> 이미지 10만 장으로 개 관절 12개를
+    찾는 모델을 파인튜닝했고, 이것이 살아남은 핵심 자산이다.</dd></div>
+
+    <div class="term" id="keypoint"><dt>키포인트 <span class="en">keypoint</span></dt>
+    <dd>자세추정이 찾는 관절 점 하나하나. 좌표 (x, y)와 신뢰도로 표현된다.
+    <b>이 프로젝트의 라벨은</b> 골성 랜드마크 12개가 키포인트다.</dd></div>
+
+    <div class="term" id="finetune"><dt>파인튜닝 <span class="en">fine-tuning</span></dt>
+    <dd>이미 대량의 일반 데이터로 학습된 모델을 내 데이터로 다시 학습시켜 내 문제에 맞추는 것.
+    바닥부터 배우는 것보다 훨씬 적은 데이터로 된다. <b>이 프로젝트에서는</b> 사람과 동물
+    자세로 사전학습된 모델을 개 보행 데이터 4만 9천 장으로 파인튜닝했다.</dd></div>
+
+    <div class="term" id="backbone"><dt>백본 <span class="en">backbone</span></dt>
+    <dd>모델의 몸통. 이미지에서 특징을 뽑아내는 큰 신경망 부분이고, 그 위에 목적별 머리(헤드)가
+    붙는다. <b>이 프로젝트에서는</b> 온디바이스 배포 가능성, 라이선스, 동물 데이터 성능
+    순서로 가중치를 두고 백본을 골랐다.</dd></div>
+
+    <div class="term" id="tcn"><dt>TCN <span class="en">Temporal Convolutional Network</span></dt>
+    <dd>시간 순서가 있는 데이터(시계열)를 다루는 가벼운 신경망. 관절 좌표의 흐름을 받아
+    판정을 내리는 역할이었다. <b>이 프로젝트에서는</b> 파라미터 18만 개짜리 작은 TCN을
+    분류기로 썼는데, 데이터에 신호가 없어 크기와 무관하게 실패했다.</dd></div>
+
+    <div class="term" id="param"><dt>파라미터 <span class="en">parameter</span></dt>
+    <dd>모델 안의 조절 가능한 숫자들. 학습이란 이 숫자들을 데이터에 맞게 바꾸는 과정이다.
+    개수가 많을수록 표현력이 크지만 데이터가 적으면 외워버린다(과적합).
+    <b>이 프로젝트의 자세추정 모델은 2,100만 개,</b> 분류기는 18만 개였다.</dd></div>
+
+    <div class="term" id="epoch"><dt>에폭 / 배치 <span class="en">epoch / batch</span></dt>
+    <dd>에폭은 전체 데이터를 한 바퀴 도는 것, 배치는 한 번에 계산하는 묶음 크기.
+    <b>이 프로젝트에서는</b> 에폭 수 대신 시간(11시간)을 정해두고 그 안에서 도는 만큼
+    돌리는 방식을 썼다. 45에폭에서 마무리됐다.</dd></div>
+
+    <div class="term" id="loss"><dt>손실 <span class="en">loss</span></dt>
+    <dd>모델의 답과 정답의 차이를 잰 숫자. 학습은 이 숫자를 줄이는 방향으로 진행된다.
+    <b>주의할 점:</b> 학습 손실이 내려가는 것과 처음 보는 데이터를 맞히는 것은 다르다.
+    이 프로젝트의 분류기는 손실이 잘 내려갔지만 검증에서는 동전 던지기였다. 외운 것이다.</dd></div>
+
+    <div class="term" id="overfit"><dt>과적합 <span class="en">overfitting</span></dt>
+    <dd>모델이 학습 데이터를 이해하는 대신 통째로 외워버려서, 새 데이터 앞에서 무너지는 현상.
+    데이터가 적고 모델이 클수록 잘 생긴다. <b>이 프로젝트에서는</b> 검증 지표와 시험 지표가
+    같았던 것(0.8686 대 0.8690)이 과적합 없음의 증거였다.</dd></div>
+
+    <div class="term" id="augment"><dt>증강 <span class="en">augmentation</span></dt>
+    <dd>학습 데이터를 인위적으로 변형(회전, 색 변화, 자르기)해 다양성을 늘리는 기법.
+    <b>이 프로젝트에서는</b> 넉 장을 한 장에 붙이는 모자이크 증강이 기본으로 켜져 있었는데,
+    개만 크게 잘라낸 우리 데이터에서는 개를 도로 작게 만드는 역효과라서 껐다.</dd></div>
+
+    <div class="term" id="normalize"><dt>정규화 <span class="en">normalization</span></dt>
+    <dd>크기와 위치가 제각각인 데이터를 같은 기준으로 맞추는 것. 큰 개와 작은 개의 궤적을
+    비교하려면 몸통 길이로 나눠야 한다. <b>이 프로젝트의 함정:</b> 기준이 되는 관절이 흔들리면
+    그 흔들림이 나눗셈을 타고 모든 관절에 퍼진다. 프레임마다 재던 기준을 시퀀스당 한 번으로
+    바꿔 이 문제를 줄였다.</dd></div>
+  </dl>
+</section>
+
+<section id="data">
+  <div class="ch">04</div>
+  <h2>데이터 다루기</h2>
+  <dl class="gl">
+    <div class="term" id="label"><dt>라벨 <span class="en">label</span></dt>
+    <dd>데이터에 붙은 정답. 이미지의 관절 좌표, 개의 등급 같은 것들이다. 모델은 라벨을 보고
+    배우므로 <b>라벨의 품질과 의미가 모델의 상한이다.</b> 이 프로젝트가 실패에서 배운 핵심이
+    바로 라벨의 정체(촉진 등급)를 늦게 파악한 것이었다.</dd></div>
+
+    <div class="term" id="split"><dt>학습 / 검증 / 시험 분할</dt>
+    <dd>데이터를 세 몫으로 나누는 것. 학습용으로 배우고, 검증용으로 중간 점검하며 조정하고,
+    시험용은 마지막에 딱 한 번 본다. 시험 성적이 진짜 성적이다.
+    <b>이 프로젝트는</b> 약 72 : 14 : 14로 나눴다.</dd></div>
+
+    <div class="term" id="leakage"><dt>데이터 누수 <span class="en">data leakage</span></dt>
+    <dd>시험 문제가 학습 자료에 섞여 들어가 성적이 부풀려지는 것. 연속 촬영 프레임은 거의
+    같은 사진이라, 프레임 단위로 나누면 같은 장면이 양쪽에 들어간다.
+    <b>이 프로젝트에서는</b> 개체(개 한 마리) 단위로 나눠서 같은 개가 학습과 시험에
+    동시에 들어가지 않게 했다.</dd></div>
+
+    <div class="term" id="dogsplit"><dt>개체 단위 분할</dt>
+    <dd>프레임이나 영상이 아니라 개 한 마리를 통째로 학습 또는 시험 쪽에 배정하는 분할.
+    누수를 막는 표준 방법이다. <b>이 프로젝트의 미해결 문제:</b> 어느 촬영이 같은 개인지
+    확실한 ID가 없어서, 날짜를 포함하면 740마리, 빼면 179마리가 된다.
+    둘 다 보고하기로 했다.</dd></div>
+
+    <div class="term" id="bbox"><dt>경계 상자 <span class="en">bounding box</span></dt>
+    <dd>사진 속 대상을 감싸는 직사각형. <b>이 프로젝트에서는</b> 관절 좌표로 상자를 만들어
+    개만 잘라냈다. 원본에서 개가 화면의 23%뿐이라, 이 크롭으로 연산을 14분의 1로 줄이고
+    45GB를 1.4GB로 만들었다.</dd></div>
+
+    <div class="term" id="topdown"><dt>top-down 방식</dt>
+    <dd>자세추정의 두 방식 중 하나. 먼저 대상을 찾아 상자로 잘라낸 뒤 그 안에서 관절을 찾는다.
+    반대는 전체 화면에서 바로 찾는 단일 단계 방식. <b>같은 입력 크기 설정이라도 두 방식의
+    의미가 다르다.</b> 이걸 섞어 써서 개가 59픽셀이 되는 실수가 실제로 있었다.</dd></div>
+
+    <div class="term" id="traj"><dt>궤적 <span class="en">trajectory</span></dt>
+    <dd>관절 위치를 시간 순으로 이은 것. 프레임마다 찍힌 점들이 곡선이 된다.
+    <b>이 프로젝트에서는</b> 12개 관절의 궤적이 분류기의 입력이었다.</dd></div>
+
+    <div class="term" id="fps"><dt>fps <span class="en">frames per second</span></dt>
+    <dd>초당 프레임 수. 영상이 1초에 몇 장의 사진으로 이뤄지는지.
+    <b>이 프로젝트의 데이터에는 fps 정보가 없어서</b> 15로 가정하고, 프레임 간 이동량으로
+    그 가정이 무리가 없음을 확인했다.</dd></div>
+
+    <div class="term" id="manifest"><dt>매니페스트 <span class="en">manifest</span></dt>
+    <dd>데이터 전체의 목록표. 시퀀스마다 파일 경로, 등급, 견종, 방향 같은 정보를 한 줄씩 담은
+    CSV 파일이다. 원본 데이터의 복잡한 구조와 학습 코드를 분리해주는 중간층 역할을 한다.</dd></div>
+  </dl>
+</section>
+
+<section id="stats">
+  <div class="ch">05</div>
+  <h2>검증의 도구</h2>
+  <dl class="gl">
+    <div class="term" id="cv"><dt>교차검증 <span class="en">cross-validation</span></dt>
+    <dd>데이터를 여러 조각으로 나눠 돌아가며 시험 보는 방법. 한 번의 분할 운에 결과가
+    좌우되는 것을 막는다. <b>이 프로젝트에서는</b> 개체 단위 4조각 교차검증으로
+    신호 유무를 판단했다.</dd></div>
+
+    <div class="term" id="logistic"><dt>로지스틱 회귀 <span class="en">logistic regression</span></dt>
+    <dd>가장 단순한 분류 모델. 특징들의 가중 합으로 확률 하나를 낸다.
+    <b>왜 일부러 단순한 것을 쓰는가:</b> 딥러닝이 실패했을 때 "모델이 약해서"인지
+    "데이터에 없어서"인지 구분하려면 가장 단순한 기준선이 필요하다.
+    이 프로젝트의 판정 불가 결론은 이 기준선 실험들이 뒷받침했다.</dd></div>
+
+    <div class="term" id="baseline"><dt>기준점 실험 <span class="en">sanity check</span></dt>
+    <dd>반드시 맞혀야 정상인 쉬운 문제를 일부러 풀려보는 것. 이것도 못 맞히면 파이프라인이
+    고장난 것이다. <b>이 프로젝트에서는</b> 견종 판별을 기준점으로 썼다. 견종은 잡히는데(0.66)
+    등급만 안 잡혀서(0.50), 고장이 아니라 신호 부재라는 결론이 섰다.</dd></div>
+
+    <div class="term" id="pck"><dt>PCK <span class="en">Percentage of Correct Keypoints</span></dt>
+    <dd>자세추정의 정확도 지표. 예측한 관절이 정답에서 일정 거리 안에 들어온 비율이다.
+    평균 지표는 나쁜 관절 하나를 가리므로 <b>이 프로젝트에서는 관절별로 따로 쟀다.</b>
+    무릎 0.793, 견갑극 0.628처럼 몸통 랜드마크가 유독 낮다는 것이 드러났다.</dd></div>
+
+    <div class="term" id="map"><dt>mAP <span class="en">mean Average Precision</span></dt>
+    <dd>탐지와 자세추정 분야의 표준 종합 점수. 여러 엄격함 수준의 정확도를 평균낸다.
+    <b>주의:</b> 관절 수 같은 조건이 다르면 남의 점수와 직접 비교할 수 없다. 이 프로젝트에서
+    벤치마크보다 높은 0.87이 나온 것은 문제가 더 쉬웠기 때문이라고 깎아 읽었다.</dd></div>
+  </dl>
+</section>
+
+<section id="deploy">
+  <div class="ch">06</div>
+  <h2>기기에 싣기</h2>
+  <dl class="gl">
+    <div class="term" id="ondevice"><dt>온디바이스 <span class="en">on-device</span></dt>
+    <dd>서버로 보내지 않고 폰 안에서 계산을 끝내는 방식. 영상이 기기 밖으로 나가지 않아
+    사생활 걱정이 없고 통신비도 없다. <b>이 프로젝트의 제품 전제</b>라서 모델 크기와
+    칩 호환성이 백본 선택의 1순위 기준이었다.</dd></div>
+
+    <div class="term" id="coreml"><dt>Core ML</dt>
+    <dd>애플 기기에서 머신러닝 모델을 돌리는 공식 형식이자 실행기. 학습은 다른 도구로 하고
+    마지막에 이 형식(.mlpackage)으로 변환한다. <b>이 프로젝트에서는</b> 변환 도구가
+    특정 라이브러리 버전에서만 동작해서 버전 고정이 함정 목록에 두 번 올라갔다.</dd></div>
+
+    <div class="term" id="ane"><dt>ANE <span class="en">Apple Neural Engine</span></dt>
+    <dd>아이폰 칩 안의 머신러닝 전용 처리 장치. 여기서 돌면 빠르고 배터리를 아낀다.
+    다만 모든 모델 구조가 올라가는 것이 아니라서, ANE 친화적 구조인지가
+    백본 선택 기준에 들어갔다.</dd></div>
+
+    <div class="term" id="mps"><dt>MPS <span class="en">Metal Performance Shaders</span></dt>
+    <dd>맥의 GPU로 학습을 돌리는 애플의 기술. 엔비디아 GPU가 표준인 세계에서 맥으로 학습하면
+    지원이 덜 되는 구석을 만난다. <b>이 프로젝트에서는</b> 데이터 로더 병렬화와 함께 쓰면
+    멈추는 문제가 있어 우회 설정을 함정 목록에 적어뒀다.</dd></div>
+
+    <div class="term" id="ckpt"><dt>체크포인트 <span class="en">checkpoint</span></dt>
+    <dd>학습 중간 상태를 파일로 저장한 것. 몇 시간짜리 학습이 중간에 끊겨도 저장 지점부터
+    다시 시작할 수 있다. <b>이 프로젝트에서는</b> 5에폭마다 저장하도록 걸어두고
+    밤새 학습을 돌렸다.</dd></div>
+  </dl>
+</section>
+
+<p class="note">용어 설명은 이 프로젝트의 맥락에 맞춰 단순화한 것으로, 수의학 정보는
+참고용이며 정확한 진단과 치료는 수의사의 몫입니다.</p>
+
+<footer>
+  <a href="https://github.com/jsonpassion">github.com/jsonpassion</a>
+</footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById("themeToggle");
+    function cur() { return document.documentElement.dataset.theme || "dark"; }
+    function paint() { btn.textContent = cur() === "dark" ? "☀️" : "🌙"; }
+    btn.addEventListener("click", function () {
+      var next = cur() === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("dogtor-theme", next);
+      paint();
+    });
+    paint();
+  })();
+
+  (function () {
+    var input = document.getElementById("glFilter");
+    var terms = Array.prototype.slice.call(document.querySelectorAll(".gl .term"));
+    var sections = Array.prototype.slice.call(document.querySelectorAll("section"));
+    input.addEventListener("input", function () {
+      var q = input.value.trim().toLowerCase();
+      terms.forEach(function (t) {
+        t.style.display = !q || t.textContent.toLowerCase().indexOf(q) >= 0 ? "" : "none";
+      });
+      sections.forEach(function (s) {
+        var any = Array.prototype.some.call(s.querySelectorAll(".term"),
+          function (t) { return t.style.display !== "none"; });
+        s.style.display = any ? "" : "none";
+      });
+    });
+  })();
+</script>
+</body>
+</html>
