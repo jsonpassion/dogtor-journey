@@ -127,7 +127,7 @@
   (function () {
     var btn = document.getElementById("themeToggle");
     function cur() { return document.documentElement.dataset.theme || "light"; }
-    function paint() { btn.textContent = cur() === "dark" ? "☀️" : "🌙"; }
+    function paint() { btn.textContent = cur() === "dark" ? "🌙" : "☀️"; }
     btn.addEventListener("click", function () {
       var next = cur() === "dark" ? "light" : "dark";
       document.documentElement.dataset.theme = next;
