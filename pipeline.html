@@ -56,10 +56,11 @@
   <a href="#data"><span class="n">07</span>데이터와 스키마</a>
   <a href="#schema"><span class="n">08</span>가정이 틀린 지점</a>
   <a href="#rework"><span class="n">09</span>설계를 바꾼 발견</a>
-  <a href="#memory"><span class="n">10</span>기억 하니스</a>
-  <a href="#stuck"><span class="n">11</span>막힌 지점들</a>
-  <a href="#insight"><span class="n">12</span>인사이트</a>
-  <a href="#log"><span class="n">13</span>빌드 로그</a>
+  <a href="#ios"><span class="n">10</span>기록 도구로 다시 세우기</a>
+  <a href="#memory"><span class="n">11</span>기억 하니스</a>
+  <a href="#stuck"><span class="n">12</span>막힌 지점들</a>
+  <a href="#insight"><span class="n">13</span>인사이트</a>
+  <a href="#log"><span class="n">14</span>빌드 로그</a>
 </aside>
 
 <div class="wrap">
@@ -939,8 +940,125 @@ flowchart TD
   <b>두 기준으로 모두 평가하고 그 차이를 누수의 크기로 함께 보고한다.</b></div>
 </section>
 
-<section id="memory">
+<section id="ios">
   <div class="ch">10</div>
+  <h2>기록 도구로 다시 세우기</h2>
+  <p class="section-lede">등급 분류가 접혔으니 제품 정의를 다시 골랐다.
+  앱은 판정하지 않는다. 걸음을 측정해 수의사에게 보여줄 기록을 만든다.
+  자세추정 모델만으로 성립하는 방향이고, 이 프로젝트의 원칙과도 맞물린다.</p>
+
+  <div class="callout">원칙이 제품 구조가 되었다. <b>숫자를 만드는 일은 기계가 하고,
+  숫자를 읽고 결정하는 일은 사람이 한다.</b> 등급을 맞히려던 동안에는 이 문장이
+  작업 방식에 대한 다짐이었는데, 이제는 앱이 하는 일과 하지 않는 일의 경계선이 되었다.</div>
+
+  <h3>판정하던 코드를 걷어냈다</h3>
+  <p>기존 앱 골격에는 세 단계 판정과 그에 딸린 문구가 있었다. 정상 범위, 관찰 필요,
+  상담 권장. 근거가 사라진 판정이라 전부 지웠다. 시계열 입력 길이 150과 프레임마다
+  다시 재던 정규화도 함께 지웠다. <b>뒤집힌 전제 위에 쌓인 코드는 고치는 것보다
+  지우는 것이 빠르다.</b></p>
+  <p>대신 넣은 것은 측정 기록 한 장이다. 발끝이 오르내리는 궤적 차트, 걸음 빈도와
+  진폭 비, 관절이 찍힌 대표 프레임 두 장, 그리고 A4 한 장짜리 PDF. 마지막 줄은
+  이렇게 적었다. <b>이 자료는 측정 기록이며 진단이 아닙니다.</b></p>
+
+  <h3>파이썬이 원본이고 앱은 미러다</h3>
+  <p>같은 계산을 두 언어로 두 번 쓰면 반드시 어긋난다. 그래서 학습 파이프라인의
+  파이썬 코드를 원본으로 두고, 앱의 스위프트 코드는 그것의 미러로 취급했다.
+  <b>같은 입력에서 같은 숫자가 나오는지를 매 단계 숫자로 확인했다.</b></p>
+
+  <figure class="viz">
+  <svg viewBox="0 0 620 250" role="img" aria-label="영상에서 기록까지의 처리 사슬과 각 지점의 검증 오차">
+    <defs>
+      <style>
+        @keyframes flow { 0% { opacity:.3 } 50% { opacity:1 } 100% { opacity:.3 } }
+        .st1 { animation: flow 4s ease-in-out infinite }
+        .st2 { animation: flow 4s ease-in-out infinite .5s }
+        .st3 { animation: flow 4s ease-in-out infinite 1s }
+        .st4 { animation: flow 4s ease-in-out infinite 1.5s }
+        .st5 { animation: flow 4s ease-in-out infinite 2s }
+      </style>
+      <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="var(--sketch)"/>
+      </marker>
+    </defs>
+
+    <text class="sk-t" x="20" y="22">처리 사슬</text>
+    <text class="sk-s" x="20" y="40">각 칸은 앞 칸의 출력을 받는다. 하나가 틀리면 뒤가 전부 틀린다</text>
+
+    <g class="st1"><rect class="sk-box" x="20" y="56" width="104" height="40" rx="4"/></g>
+    <text class="sk-s" x="34" y="74">동물 탐지</text>
+    <text class="sk-s" x="34" y="88">상자 찾기</text>
+
+    <g class="st2"><rect class="sk-box" x="140" y="56" width="104" height="40" rx="4"/></g>
+    <text class="sk-s" x="154" y="74">크롭</text>
+    <text class="sk-s" x="154" y="88">여유 25%</text>
+
+    <g class="st3"><rect class="sk-box" x="260" y="56" width="104" height="40" rx="4"/></g>
+    <text class="sk-s" x="274" y="74">자세추정</text>
+    <text class="sk-s" x="274" y="88">관절 12개</text>
+
+    <g class="st4"><rect class="sk-box" x="380" y="56" width="104" height="40" rx="4"/></g>
+    <text class="sk-s" x="394" y="74">좌표 복원</text>
+    <text class="sk-s" x="394" y="88">원본 기준으로</text>
+
+    <g class="st5"><rect class="sk-box" x="500" y="56" width="100" height="40" rx="4"/></g>
+    <text class="sk-s" x="514" y="74">지표 계산</text>
+    <text class="sk-s" x="514" y="88">리듬과 진폭</text>
+
+    <path class="sk-arrow" d="M124 76 L136 76" marker-end="url(#arr3)"/>
+    <path class="sk-arrow" d="M244 76 L256 76" marker-end="url(#arr3)"/>
+    <path class="sk-arrow" d="M364 76 L376 76" marker-end="url(#arr3)"/>
+    <path class="sk-arrow" d="M484 76 L496 76" marker-end="url(#arr3)"/>
+
+    <text class="sk-t" x="20" y="136">검증한 값</text>
+    <text class="sk-s" x="20" y="154">파이썬과 앱이 같은 입력에서 얼마나 다른가</text>
+
+    <path class="sk-hi" d="M260 100 L260 170 L364 170 L364 100"/>
+    <text class="sk-a" x="266" y="188">0.125픽셀</text>
+    <text class="sk-s" x="266" y="204">기준 1픽셀</text>
+
+    <path class="sk-hi" d="M380 100 L380 186 L484 186 L484 100"/>
+    <text class="sk-a" x="386" y="204">정답 대비 1.3%</text>
+    <text class="sk-s" x="386" y="220">기준 2%</text>
+
+    <path class="sk-hi" d="M500 100 L500 202 L600 202 L600 100"/>
+    <text class="sk-a" x="440" y="238">지표 오차 0.0000007</text>
+    <text class="sk-s" x="20" y="238">탐지와 크롭은 앱 쪽에만 있어 정답 대비로 함께 확인했다</text>
+  </svg>
+  <div class="legend">
+    <span><i style="background:var(--accent)"></i>숫자로 확인한 구간</span>
+    <span><i style="background:var(--sub)"></i>처리 단계</span>
+  </div>
+  <figcaption>그림 13. 사슬의 각 지점에서 두 언어가 같은 숫자를 내는지 확인했다.</figcaption>
+  </figure>
+
+  <div class="scroll-x"><table>
+    <thead><tr><th style="width:30%">확인한 것</th><th style="width:22%">실측</th><th>기준으로 잡은 값</th></tr></thead>
+    <tbody>
+    <tr><td>모델 출력 해석</td><td><b>0.125픽셀</b></td><td>1픽셀. 실측은 정밀도 축소의 알갱이 수준이다</td></tr>
+    <tr><td>탐지에서 좌표 복원까지</td><td><b>정답 대비 1.3%</b></td><td>2%. 개 크기로 환산하면 몇 픽셀 차이다</td></tr>
+    <tr><td>정규화와 지표</td><td><b>0.0000007</b></td><td>0.0001. 사실상 동일한 계산이다</td></tr>
+    <tr><td>실제 프레임 인식률</td><td><b>100%</b></td><td>90%. 30장 전부에서 개를 찾았다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>미러를 만들다가 원본의 결함을 찾았다</h3>
+  <p>정규화 코드를 스위프트로 옮기다가 이상한 줄을 만났다. 몸통 축의 기준점은
+  데이터 종류에 따라 다른 관절을 쓰도록 이미 고쳐뒀는데, <b>그 기준점이 유효한지
+  검사하는 줄만 옛 관절 번호를 보고 있었다.</b> 앞서 고친 곳 바로 옆이었다.</p>
+  <div class="callout">한 곳을 고치면 같은 결함이 있는 다른 곳을 찾는다는 규칙이
+  또 한 번 값을 했다. 이번에는 <b>다른 언어로 옮겨 쓰는 작업 자체가 검사 도구</b>였다.
+  줄마다 의미를 다시 물어야 하니, 읽기만 할 때는 지나쳤던 것이 걸린다.</div>
+
+  <h3>다음은 코드가 아니다</h3>
+  <p>측정과 기록의 사슬은 전부 숫자로 확인했다. 남은 관문은 <b>병원 밖에서 찍은
+  진짜 영상</b>이다. 학습에 쓴 자료는 전부 같은 촬영장이라, 거실 마루나 아파트
+  복도에서 이 모델이 관절을 찾을지는 아무도 모른다. 지표에는 드러나지 않는 종류의
+  미지수이고, 촬영 한 번이 첫 답을 준다.</p>
+</section>
+
+<section id="memory">
+  <div class="ch">11</div>
   <h2>기억 하니스</h2>
   <p class="section-lede">프로젝트가 길어질수록 기억이 자산이 된다. 결정과 스펙과 절차를
   자동으로 축적하는 로컬 시스템을 만들었다.</p>
@@ -986,7 +1104,7 @@ flowchart TD
 </section>
 
 <section id="stuck">
-  <div class="ch">11</div>
+  <div class="ch">12</div>
   <h2>막힌 지점들</h2>
   <p class="section-lede">여기까지 오면서 실제로 깨진 것들이다. 대부분은 알고리즘이 아니라
   환경과 검증 습관에서 나왔다.</p>
@@ -1083,7 +1201,7 @@ flowchart TD
 </section>
 
 <section id="insight">
-  <div class="ch">12</div>
+  <div class="ch">13</div>
   <h2>인사이트</h2>
   <p class="section-lede">2026년 8월, 첫 준비 구간에서 배운 것들.</p>
 
@@ -1164,6 +1282,14 @@ flowchart TD
   <b>기준을 결과가 나온 뒤에 정하면 반드시 결과에 맞춰 움직인다.</b>
   미리 적어둔 한 줄이 반나절을 아꼈고, 그 시간에 확실한 산출물이 나왔다.</p></div>
 
+  <div class="panel"><h3>다른 언어로 옮겨 쓰는 것이 검사가 된다</h3>
+  <p>같은 계산을 학습 쪽 파이썬과 앱 쪽 스위프트로 두 번 썼다. 어긋날 위험을 감수한
+  대신, 옮겨 쓰는 과정에서 <b>원본의 결함 하나를 찾았다.</b> 기준점을 바꿔뒀는데
+  그것이 유효한지 검사하는 줄만 옛 값을 보고 있었다. 읽기만 할 때는 지나쳤던 줄이다.
+  <b>줄마다 의미를 다시 물어야 하는 작업은 그 자체로 검사다.</b>
+  그리고 같은 입력에서 같은 숫자가 나오는지를 매번 확인하게 만들어 두면,
+  어긋남은 다음에도 즉시 드러난다.</p></div>
+
   <div class="panel"><h3>도구는 지나가고 규칙이 남는다</h3>
   <p>이 구간에서 만든 스크립트 중 절반은 다시 쓰지 않을 것이다. 그런데 그 과정에서
   적어둔 규칙은 계속 쓴다. <b>모듈을 어디서 실행하는지, 셸이 어떤 종류인지, 검증을
@@ -1177,7 +1303,7 @@ flowchart TD
 </section>
 
 <section id="log">
-  <div class="ch">13</div>
+  <div class="ch">14</div>
   <h2>빌드 로그</h2>
   <p class="section-lede">시행착오를 포함한 시간순 기록.</p>
   <div class="timeline">
@@ -1219,7 +1345,10 @@ flowchart TD
     <div class="tl"><div class="d">2026.08.21</div><div><h3>분류기 판정과 모델 변환</h3>
     <p>등급 분류는 이 데이터의 걸음으로 성립하지 않는다고 판정했다. 근거는 그림 12.
     자세추정 모델은 Core ML 로 변환을 마쳤다. 제품 방향 선택지 셋을 정리했다.</p></div></div>
-    <div class="tl future"><div class="d">NEXT</div><div><h3>실데이터 학습, 평가를 직접 판단</h3>
+    <div class="tl"><div class="d">2026.08.21</div><div><h3>기록 도구로 방향 전환과 앱 구현</h3>
+    <p>판정 코드를 걷어내고 측정 기록과 PDF 로 다시 세웠다. 처리 사슬의 각 지점을
+    파이썬과 대조해 확인했다. 남은 관문은 병원 밖에서 찍은 진짜 영상이다.</p></div></div>
+    <div class="tl future"><div class="d">NEXT</div><div><h3>병원 밖 환경에서 첫 촬영</h3>
       <p>학습 완주 후 민감도와 특이도 게이트 통과 여부를 스스로 판정하는 것이 다음 마일스톤이다.</p></div></div>
     <div class="tl future"><div class="d">THEN</div><div><h3>실기기 검증과 출시</h3>
       <p>실제 강아지로 검증하고 한국 우선 출시. 이후 질환 확장, 그다음 고양이.</p></div></div>
