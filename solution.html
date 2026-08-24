@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>솔루션 소개 — Dogtor 독터</title>
+<meta name="description" content="Dogtor 최종본의 기능을 한 장으로. 30초 측면 영상으로 수의사에게 보여줄 걸음 기록을 만든다.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var t = localStorage.getItem("dogtor-theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  })();
+</script>
+</head>
+<body>
+
+<div id="topbar"><div class="tb">
+  <a class="brand" href="index.html">Dogtor</a>
+  <span class="spacer"></span>
+  <a class="nav" href="index.html">개요</a>
+  <a class="nav on" href="solution.html">솔루션 소개</a>
+  <a class="nav" href="pipeline.html">파이프라인 해부</a>
+  <a class="nav" href="glossary.html">용어 사전</a>
+  <button id="themeToggle" aria-label="다크 라이트 전환" title="다크 라이트 전환">🌙</button>
+</div></div>
+
+<div class="wrap">
+
+<header class="hero" style="padding: 10vh 0 7vh">
+  <span class="kicker">Dogtor — Final</span>
+  <h1 style="font-size: clamp(34px, 6vw, 62px)">30초 걸음,<br>진료실로 가는 기록</h1>
+  <p class="lede">기기 없이 카메라 30초. 반려견의 걸음을 측정해
+  <b>수의사에게 보여줄 한 장</b>을 만든다. 앱은 판정하지 않는다.
+  숫자는 기계가 만들고, 판단은 수의사가 한다.</p>
+</header>
+
+<section>
+  <div class="ch">FEATURES</div>
+  <h2>최종본의 기능</h2>
+  <div class="cards">
+    <div class="card"><h3>30초 측정</h3>
+      <p>촬영 또는 앨범 선택. 전 과정 온디바이스, 영상은 기기 밖으로 나가지 않는다</p></div>
+    <div class="card"><h3>자체 자세추정</h3>
+      <p>골성 랜드마크 12관절. 국내 소형견 4만 9천 장으로 파인튜닝한 40MB 모델</p></div>
+    <div class="card"><h3>걸음 기록 한 장</h3>
+      <p>발끝 궤적 차트, 걸음 빈도, 앞뒤 진폭 비. 정상 범위 표시 없음 — 근거가 없으므로</p></div>
+    <div class="card"><h3>대표 장면</h3>
+      <p>뒷발이 가장 높을 때와 낮을 때. 관절 위치 오버레이</p></div>
+    <div class="card"><h3>좌우 비교</h3>
+      <p>양쪽 측면을 찍으면 측정값을 나란히. 차이의 해석은 수의사 몫</p></div>
+    <div class="card"><h3>A4 PDF 공유</h3>
+      <p>진료실에 들고 가는 실물. 공유시트로 전송</p></div>
+    <div class="card"><h3>재촬영 안내</h3>
+      <p>인식률, 길이, 옆모습 게이트. 판정 대신 다시 찍는 법을 알려준다</p></div>
+    <div class="card"><h3>지난 기록</h3>
+      <p>기기 안에 쌓이는 측정 이력. 다음 달과 비교하는 변화 추적의 기반</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="ch">NOT-FEATURES</div>
+  <h2>하지 않는 것</h2>
+  <p class="section-lede">실데이터 검증에서 등급 분류가 불성립으로 판정된 뒤,
+  하지 않는 것이 제품의 정체성이 됐다.</p>
+  <div class="cards">
+    <div class="card"><h3>판정 없음</h3><p>정상, 관찰, 상담 3단계를 만들지 않는다</p></div>
+    <div class="card"><h3>등급 없음</h3><p>1기부터 4기까지의 예측을 하지 않는다</p></div>
+    <div class="card"><h3>정상 범위 없음</h3><p>근거 데이터가 없는 기준선을 긋지 않는다</p></div>
+  </div>
+  <div class="callout">모든 화면의 마지막 줄 — <b>"이 자료는 측정 기록이며 진단이 아닙니다.
+  수의사와 상담할 때 참고 자료로 보여주세요."</b></div>
+</section>
+
+<section>
+  <div class="ch">NUMBERS</div>
+  <h2>검증 숫자</h2>
+  <div class="stats">
+    <div class="stat"><span class="num">0.869</span>
+      <span class="lbl">자세추정 시험셋 정확도. 검증셋과 동일 = 과적합 없음</span></div>
+    <div class="stat"><span class="num">0.125px</span>
+      <span class="lbl">앱 디코더와 학습 파이프라인의 좌표 차이</span></div>
+    <div class="stat"><span class="num">1e-6</span>
+      <span class="lbl">걸음 지표의 두 언어 간 오차. 사실상 같은 계산</span></div>
+    <div class="stat"><span class="num">100%</span>
+      <span class="lbl">실프레임 30장 개 인식률</span></div>
+    <div class="stat"><span class="num">40MB</span>
+      <span class="lbl">온디바이스 모델 크기. 서버 비용 0</span></div>
+    <div class="stat"><span class="num">3.4ms</span>
+      <span class="lbl">프레임당 추론 시간 (M2 Ultra 실측)</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="ch">STACK</div>
+  <h2>기술 키워드</h2>
+  <div class="scroll-x"><table>
+    <tbody>
+    <tr><td style="width:30%">측정</td><td>Vision 동물 탐지 → 25% 여유 크롭 → 자체 포즈 모델(Core ML FP16) → 좌표 복원 → 시퀀스 정규화</td></tr>
+    <tr><td>모델</td><td>yolo11m-pose 풀 파인튜닝, 측면 48,938장, 개체 단위 분할</td></tr>
+    <tr><td>검증</td><td>파이썬 원본, Swift 미러 — 처리 사슬의 각 지점을 숫자로 대조</td></tr>
+    <tr><td>화면</td><td>SwiftUI, Swift Charts, ImageRenderer PDF</td></tr>
+    <tr><td>저장</td><td>로컬 전용. 원시 궤적 저장 후 열 때 재계산</td></tr>
+    <tr><td>프라이버시</td><td>온디바이스 추론, 서버 전송 없음, 공유는 명시적으로만</td></tr>
+    </tbody>
+  </table></div>
+  <div class="btns" style="margin-top: 34px">
+    <a class="btn primary" href="pipeline.html">이렇게 되기까지의 전 과정 →</a>
+    <a class="btn ghost" href="glossary.html">용어 사전</a>
+  </div>
+</section>
+
+<p class="note">Dogtor의 모든 출력은 측정 기록이며 의학적 진단이 아닙니다.
+판단은 수의사의 몫입니다.</p>
+
+<footer>
+  <a href="https://github.com/jsonpassion">github.com/jsonpassion</a>
+</footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById("themeToggle");
+    function cur() { return document.documentElement.dataset.theme || "dark"; }
+    function paint() { btn.textContent = cur() === "dark" ? "☀️" : "🌙"; }
+    btn.addEventListener("click", function () {
+      var next = cur() === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("dogtor-theme", next);
+      paint();
+    });
+    paint();
+  })();
+</script>
+</body>
+</html>
