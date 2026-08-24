@@ -64,7 +64,7 @@ h2 { font-size: clamp(26px, 3.6vw, 36px); font-weight: 900; letter-spacing: -0.0
 h3 { font-size: 17.5px; font-weight: 800; letter-spacing: -0.01em; }
 .kicker {
   display: inline-block; font-family: var(--mono); font-size: 12px; font-weight: 700;
-  letter-spacing: .14em; text-transform: uppercase; color: var(--ink);
+  letter-spacing: .14em; text-transform: uppercase; color: #191410;
   background: var(--pop); border: 2px solid var(--line); border-radius: 4px;
   padding: 3px 10px; box-shadow: 3px 3px 0 var(--shadow);
 }
